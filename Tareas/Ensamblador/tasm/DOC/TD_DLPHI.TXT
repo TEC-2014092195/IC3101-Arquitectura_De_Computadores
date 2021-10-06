@@ -1,0 +1,90 @@
+/*****************************************************************************/
+                         TURBO DEBUGGER for WINDOWS
+                         Additions for Delphi Users
+
+Turbo Debugger for Windows (TDW.EXE), version 4.6, contains several
+enhancements that support the Delphi version of Object Pascal. Specifically,
+Turbo Debugger for Windows, version 4.6, has the following Delphi-specific
+additions:
+   1) Delphi (Object Pascal) property inspection
+   2) Delphi (Object Pascal) exception handling
+
+In addition, you can easily launch TDW.EXE from Delphi, as described in
+   3) Launching TDW from Delphi
+
+
+1) Delphi (Object Pascal) property inspection
+---------------------------------------------
+When inspecting or evaluating Delphi classes, the Object Pascal evaluator in
+TDW.EXE does not automatically display the current values of all the properties
+contained in the class. To obtain the current value for most Delphi properties,
+a "get" function must be called. Because of this, the evaluator in TDW.EXE does
+not automatically display all property values when a Delphi class is evaluated.
+
+In order to examine the current value of a Delphi property, you must use a
+fully qualified expression to explicitly point to the property. For example,
+you can use the following expression in an Inspector window (or the 
+Evaluate/Modify dialog box) to examine the BoundsRect property of Form1:
+
+   Form1.BoundsRect
+
+Note that you can also use the Descend feature of an Inspect window to
+view the value of a class property.
+
+Warning: TDW.EXE cannot evaluate properties whose property-access methods have been
+smart-linked away because there is no symbolic debug information for such properties.
+If you try to evaluate such a property, TDW.EXE generates an error message. 
+
+
+2) Delphi (Object Pascal) exception handling
+--------------------------------------------
+The Options | Exceptions command in TDW.EXE opens the Pascal Exceptions dialog
+box. This dialog box contains two checkboxes:
+
+   o Stop On Raise
+   o Stop On Destructors
+
+If you check Stop On Raise, TDW.EXE pauses the program execution when an
+Object Pascal exception is encountered. When the program pauses, TDW.EXE
+places the cursor on the code that raised the exception, either in the
+Module window or the Disassembly view of the CPU window. Note that the
+instruction pointer might not be visible, especially if Windows kernel
+code was executing when the exception was raised.
+
+If you check Stop On Destructors, Deplhi pauses the program execution after
+the exception has been handled, but before the exception object has been
+destroyed by its destructor. This gives you the ability to examine the
+exception object before processing continues.
+
+
+3) Launching TDW from Delphi
+----------------------------
+TDW.EXE can easily be launched from the Delphi Tools menu. Do place TDW
+on the Tools menu, follow these steps:
+
+  1) Choose Options | Tools, then choose Add to access the Tool Property
+     dialog box.
+
+  2) Type TDW into the Title input box (this places "TDW" on the Tools menu).
+
+  3) Use the Browse button to fill in the Program and Working Directory
+     input boxes. (Choose Browse, then navigate to the directory that
+     contains TDW.EXE and double-click on the TDW.EXE file name.)
+
+  4) To fill in the Parameters input box, choose the Macros button, then 
+     select the $EXENAME and the $TDW macros:
+
+       o  $EXENAME expands to the full path and file name of the current
+          project executable file.
+
+       o  $TDW saves, closes, and compiles the current project, complete
+          with debug information.
+
+  5) Choose Close to close the Tools Options dialog box and add TDW to the
+     Tools menu.
+
+With TDW on the Tools menu, all you need to do is choose this entry to compile
+the current project and launch TDW on the resulting executable file.
+ 
+
+/*****************************************************************************/

@@ -1,0 +1,11 @@
+
+ Start  Stop   Length Name               Class
+
+ 00000H 0017FH 00180H PILA               
+ 00180H 00180H 00001H DATOS              
+ 00190H 001B3H 00024H CODIGO             
+
+Error: Undefined symbol FACTORIAL in module FACT2.ASM
+Program entry point at 0019:0000
+Warning: No stack
+

@@ -1,0 +1,169 @@
+Turbo Assembler	 Version 4.1	    09/25/14 10:36:08	    Page 1
+Mi_cero.ASM
+
+
+
+      1	0000			     datos segment
+      2	0000  50 72 65 73 69 6F	6E+	     mensaje db	"Presione cualquier tecla para conocer su codigo ascii,	en hexadecimal y    +
+      3	      65 20 63 75 61 6C	71+  decimal",10,13,"$"	;Para imprimir $ pongo el ascii	24h
+      4	      75 69 65 72 20 74	65+
+      5	      63 6C 61 20 70 61	72+
+      6	      61 20 63 6F 6E 6F	63+
+      7	      65 72 20 73 75 20	63+
+      8	      6F 64 69 67 6F 20	61+
+      9	      73 63 69 69 2C 20	65+
+     10	      6E 20 68 65 78 61	64+
+     11	      65 63 69 6D 61 6C	20+
+     12	      79 20 64 65 63 69	6D+
+     13	      61 6C 0A 0D 24
+     14	0052  41 42 43 44 45 46		     tablahex db "ABCDEF"
+     15	0058  ??			     var2 db ?
+     16	0059			     datos EndS
+     17
+     18	0000			     codigo Segment
+     19	0000			     comienceaqui:
+     20					     Assume cs:codigo, ds:datos
+     21
+     22	0000  33 C0			     xor ax,ax
+     23	0002  B8 0000s			     mov ax,Datos
+     24	0005  8E D8			     mov Ds,Ax
+     25
+     26	0007  33 D2			     xor dx, dx
+     27
+     28	0009  BA 0000r			     mov dx,offset mensaje
+     29	000C  B4 09			     mov ah,09h
+     30	000E  CD 21			     int 21h
+     31
+     32	0010  B4 01			     mov ah,01h
+     33	0012  CD 21			     int 21h
+     34	0014  A2 0058r			     mov var2,al
+     35
+     36	0017  B2 20			     mov dl,' '
+     37	0019  B4 02			     mov ah,02h
+     38	001B  CD 21			     int 21h
+     39	001D  B2 2D			     mov dl,'-'
+     40	001F  B4 02			     mov ah,02h
+     41	0021  CD 21			     int 21h
+     42	0023  B2 3E			     mov dl,'>'
+     43	0025  B4 02			     mov ah,02h
+     44	0027  CD 21			     int 21h
+     45	0029  B2 20			     mov dl,' '
+     46	002B  B4 02			     mov ah,02h
+     47	002D  CD 21			     int 21h
+     48
+     49	002F  8A 16 0058r		     mov dl,var2
+     50	0033  80 E2 F0			     and dl,11110000b
+     51	0036  D0 EA D0 EA D0 EA	D0+	     shr dl,4
+     52	      EA
+     53	003E  80 FA 09			     cmp dl,09h
+     54	0041  7F 53			     jg	hex1
+     55	0043  80 C2 30			     add dl,30h
+     56	0046			       v1:
+     57	0046  B4 02			     mov ah,02h
+Turbo Assembler	 Version 4.1	    09/25/14 10:36:08	    Page 2
+Mi_cero.ASM
+
+
+
+     58	0048  CD 21			     int 21h
+     59	004A  8A 16 0058r		     mov dl,var2
+     60	004E  80 E2 0F			     and dl,00001111b
+     61	0051  80 FA 09			     cmp dl,09h
+     62	0054  7F 4D			     jg	hex2
+     63	0056  80 CA 30			     or	dl,30h
+     64	0059			       v2:
+     65	0059  B4 02			     mov ah,02h
+     66	005B  CD 21			     int 21h
+     67					     ;Se repite	la jugada de arriba, yo	sè que se puede	hacer por un proceso o una macro,   +
+     68				     pero no me	acuerdo.
+     69	005D  B2 20			     mov dl,' '
+     70	005F  B4 02			     mov ah,02h
+     71	0061  CD 21			     int 21h
+     72	0063  B2 2D			     mov dl,'-'
+     73	0065  B4 02			     mov ah,02h
+     74	0067  CD 21			     int 21h
+     75	0069  B2 3E			     mov dl,'>'
+     76	006B  B4 02			     mov ah,02h
+     77	006D  CD 21			     int 21h
+     78	006F  B2 20			     mov dl,' '
+     79	0071  B4 02			     mov ah,02h
+     80	0073  CD 21			     int 21h
+     81					     ;Se termina de repetir.
+     82	0075  B9 0003			     mov cx, 3
+     83	0078			       Deci_1:
+     84	0078  33 C0			     xor ax, ax
+     85	007A  33 DB			     xor bx, bx
+     86	007C  A0 0058r			     mov al, var2
+     87	007F  B3 0A			     mov bl, 10
+     88	0081  F6 F3			     div bl
+     89	0083  8A D4			     mov dl, ah
+     90	0085  80 C2 30			     add dl, 30h
+     91	0088  B4 02			     mov ah, 02h
+     92	008A  CD 21			     int 21h
+     93	008C  A2 0058r			     mov var2, al
+     94	008F  E2 E7			     loop Deci_1
+     95
+     96
+     97
+     98	0091  B8 4C00			     mov ax,4c00h
+     99	0094  CD 21			     int 21h
+    100	0096			       hex1:
+    101	0096  33 F6			     xor si,si
+    102	0098  8B F2			     mov si,dx
+    103	009A  83 EE 0A			     sub si,0ah
+    104	009D  8A 94 0052r		     mov dl,tablahex[si]
+    105	00A1  EB A3			     jmp short v1
+    106	00A3			       hex2:
+    107	00A3  33 F6			     xor si,si
+    108	00A5  8B F2			     mov si,dx
+    109	00A7  83 EE 0A			     sub si,0ah
+    110	00AA  8A 94 0052r		     mov dl,tablahex[si]
+    111	00AE  EB A9			     jmp short v2
+    112
+    113
+    114	00B0  B8 B800			     MOV AX,0B800H
+Turbo Assembler	 Version 4.1	    09/25/14 10:36:08	    Page 3
+Mi_cero.ASM
+
+
+
+    115	00B3  8E C0			 MOV ES,AX
+    116
+    117
+    118
+    119	00B5  B8 4C00			     mov ax,4c00h
+    120	00B8  CD 21			     int 21h
+    121
+    122	00BA			     codigo EndS
+    123				     End comienceaqui
+Turbo Assembler	 Version 4.1	    09/25/14 10:36:08	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/25/14"
+??FILENAME			  Text	 "Mi_cero "
+??TIME				  Text	 "10:36:08"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 MI_CERO
+@WORDSIZE			  Text	 2
+COMIENCEAQUI			  Near	 CODIGO:0000
+DECI_1				  Near	 CODIGO:0078
+HEX1				  Near	 CODIGO:0096
+HEX2				  Near	 CODIGO:00A3
+MENSAJE				  Byte	 DATOS:0000
+TABLAHEX			  Byte	 DATOS:0052
+V1				  Near	 CODIGO:0046
+V2				  Near	 CODIGO:0059
+VAR2				  Byte	 DATOS:0058
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  00BA Para	  none
+DATOS				  16  0059 Para	  none
+

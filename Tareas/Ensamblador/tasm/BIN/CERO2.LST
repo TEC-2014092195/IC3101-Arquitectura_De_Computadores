@@ -1,0 +1,125 @@
+Turbo Assembler	 Version 4.1	    08/20/14 18:08:31	    Page 1
+cero2.ASM
+
+
+
+      1	0000			     datos segment
+      2	0000  50 72 65 73 69 6F	6E+	     mensaje db	"Presione cualquier tecla para conocer su codigo ascii en hexadecimal",10,  +
+      3	      65 20 63 75 61 6C	71+  13,"$" ;Para imprimir $ pongo el ascii 24h
+      4	      75 69 65 72 20 74	65+
+      5	      63 6C 61 20 70 61	72+
+      6	      61 20 63 6F 6E 6F	63+
+      7	      65 72 20 73 75 20	63+
+      8	      6F 64 69 67 6F 20	61+
+      9	      73 63 69 69 20 65	6E+
+     10	      20 68 65 78 61 64	65+
+     11	      63 69 6D 61 6C 0A	0D+
+     12	      24
+     13	0047  41 42 43 44 45 46		     tablahex db "ABCDEF"
+     14	004D  ??			     var2 db ?
+     15	004E			     datos EndS
+     16
+     17	0000			     codigo Segment
+     18	0000			     comienceaqui:
+     19					     Assume cs:codigo, ds:datos
+     20
+     21	0000  33 C0			     xor ax,ax
+     22	0002  B8 0000s			     mov ax,Datos
+     23	0005  8E D8			     mov Ds,Ax
+     24
+     25	0007  33 D2			     xor dx, dx
+     26
+     27	0009  BA 0000r			     mov dx,offset mensaje
+     28	000C  B4 09			     mov ah,09h
+     29	000E  CD 21			     int 21h
+     30
+     31	0010  B4 01			     mov ah,01h
+     32	0012  CD 21			     int 21h
+     33	0014  A2 004Dr			     mov var2,al
+     34
+     35	0017  B2 20			     mov dl,' '
+     36	0019  B4 02			     mov ah,02h
+     37	001B  CD 21			     int 21h
+     38	001D  B2 2D			     mov dl,'-'
+     39	001F  B4 02			     mov ah,02h
+     40	0021  CD 21			     int 21h
+     41	0023  B2 3E			     mov dl,'>'
+     42	0025  B4 02			     mov ah,02h
+     43	0027  CD 21			     int 21h
+     44	0029  B2 20			     mov dl,' '
+     45	002B  B4 02			     mov ah,02h
+     46	002D  CD 21			     int 21h
+     47
+     48	002F  8A 16 004Dr		     mov dl,var2
+     49	0033  80 E2 F0			     and dl,11110000b
+     50	0036  D0 EA D0 EA D0 EA	D0+	     shr dl,4
+     51	      EA
+     52	003E  80 FA 09			     cmp dl,09h
+     53	0041  7F 1F			     jg	hex1
+     54	0043  80 C2 30			     add dl,30h
+     55	0046			       v1:
+     56	0046  B4 02			     mov ah,02h
+     57	0048  CD 21			     int 21h
+Turbo Assembler	 Version 4.1	    08/20/14 18:08:31	    Page 2
+cero2.ASM
+
+
+
+     58	004A  8A 16 004Dr		     mov dl,var2
+     59	004E  80 E2 0F			     and dl,00001111b
+     60	0051  80 FA 09			     cmp dl,09h
+     61	0054  7F 19			     jg	hex2
+     62	0056  80 CA 30			     or	dl,30h
+     63	0059			       v2:
+     64	0059  B4 02			     mov ah,02h
+     65	005B  CD 21			     int 21h
+     66	005D  B8 4C00			     mov ax,4c00h
+     67	0060  CD 21			     int 21h
+     68	0062			       hex1:
+     69	0062  33 F6			     xor si,si
+     70	0064  8B F2			     mov si,dx
+     71	0066  83 EE 0A			     sub si,0ah
+     72	0069  8A 94 0047r		     mov dl,tablahex[si]
+     73	006D  EB D7			     jmp short v1
+     74	006F			       hex2:
+     75	006F  33 F6			     xor si,si
+     76	0071  8B F2			     mov si,dx
+     77	0073  83 EE 0A			     sub si,0ah
+     78	0076  8A 94 0047r		     mov dl,tablahex[si]
+     79	007A  EB DD			     jmp short v2
+     80
+     81	007C  B8 4C00			     mov ax,4c00h
+     82	007F  CD 21			     int 21h
+     83
+     84	0081			     codigo EndS
+     85				     End comienceaqui
+Turbo Assembler	 Version 4.1	    08/20/14 18:08:31	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "08/20/14"
+??FILENAME			  Text	 "cero2	  "
+??TIME				  Text	 "18:08:31"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 CERO2
+@WORDSIZE			  Text	 2
+COMIENCEAQUI			  Near	 CODIGO:0000
+HEX1				  Near	 CODIGO:0062
+HEX2				  Near	 CODIGO:006F
+MENSAJE				  Byte	 DATOS:0000
+TABLAHEX			  Byte	 DATOS:0047
+V1				  Near	 CODIGO:0046
+V2				  Near	 CODIGO:0059
+VAR2				  Byte	 DATOS:004D
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0081 Para	  none
+DATOS				  16  004E Para	  none
+

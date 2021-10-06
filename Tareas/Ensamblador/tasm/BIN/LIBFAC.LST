@@ -1,0 +1,55 @@
+Turbo Assembler	 Version 4.1	    09/03/14 22:17:39	    Page 1
+libfac.ASM
+
+
+
+      1	0000			     codigo segment
+      2					     public factorial
+      3						     Assume cs:	codigo
+      4	0000					     factorial proc far
+      5	0000  55					     push bp
+      6	0001  8B EC					     mov bp,sp
+      7	0003  8B 46 06					     mov ax,[bp+6]
+      8	0006  3D 0000					     cmp ax,0
+      9	0009  77 06					     ja	 L1
+     10	000B  B8 0001					     mov ax,1
+     11	000E  EB 0C 90					     jmp L2
+     12
+     13	0011  48				     L1: dec ax
+     14	0012  50					     push ax
+     15	0013  0E E8 FFE9				     Call factorial
+     16
+     17	0017					     ReturnF:
+     18	0017  8B 5E 06					     mov bx,[bp+6]
+     19	001A  F7 E3					     mul bx
+     20
+     21	001C  5D				     L2: pop bp
+     22	001D  CA 0002					     ret 2
+     23	0020					     factorial endP
+     24	0020			     codigo EndS
+     25						     End
+Turbo Assembler	 Version 4.1	    09/03/14 22:17:39	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/03/14"
+??FILENAME			  Text	 "libfac  "
+??TIME				  Text	 "22:17:39"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 LIBFAC
+@WORDSIZE			  Text	 2
+FACTORIAL			  Far	 CODIGO:0000
+L1				  Near	 CODIGO:0011
+L2				  Near	 CODIGO:001C
+RETURNF				  Near	 CODIGO:0017
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0020 Para	  none
+

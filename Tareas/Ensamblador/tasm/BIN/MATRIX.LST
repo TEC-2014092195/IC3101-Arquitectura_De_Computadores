@@ -1,0 +1,404 @@
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 1
+matrix.ASM
+
+
+
+      1				     ; --------------------------------------------------------------------
+      2				     ;|	Proyecto     : Matrix									    +
+      3				     |
+      4				     ;|	Elaborado por: Kevin Hernandez Rostran				   |
+      5				     ;|	Curso	     : Arquitectura - Instituto	Tecnologico de Costa Rica  |
+      6				     ; --------------------------------------------------------------------
+      7
+      8	0000			     Pila Segment Stack	'Stack'
+      9	0000  0800*(????)		     dw	2048 dup(?)
+     10	1000			     Pila Ends
+     11
+     12	0000			     Datos Segment
+     13	0000  00			     FIL DB 0
+     14	0001  00			     COL DB 0
+     15	0002  0064			     PAUSA1 dw 100
+     16	0004  0064			     PAUSA2 dw 100 ; pausa
+     17	0006  00				     CONTAR_F DB 0
+     18	0007  00				     CAMB_BG DB	0
+     19	0008  00				     FLAG DB 0
+     20	0009  0A 0A 2D 2D 2D 2D	2D+		     MSG DB 10,10,								    +
+     21	      2D 2D 2D 2D 2D 2D	2D+  '-------------------------------------------------------------------------------',10
+     22	      2D 2D 2D 2D 2D 2D	2D+
+     23	      2D 2D 2D 2D 2D 2D	2D+
+     24	      2D 2D 2D 2D 2D 2D	2D+
+     25	      2D 2D 2D 2D 2D 2D	2D+
+     26	      2D 2D 2D 2D 2D 2D	2D+
+     27	      2D 2D 2D 2D 2D 2D	2D+
+     28	      2D 2D 2D 2D 2D 2D	2D+
+     29	      2D 2D 2D 2D 2D 2D	2D+
+     30	      2D 2D 2D 2D 2D 2D	2D+
+     31	      2D 2D 2D 2D 0A
+     32	005B  50 72 6F 79 65 63	74+		     MSG1 DB	    'Proyecto	  : Matrix',10
+     33	      6F 20 20 20 20 20	3A+
+     34	      20 4D 61 74 72 69	78+
+     35	      0A
+     36	0071  45 6C 61 62 6F 72	61+		     MSG2 DB	    'Elaborado por: Kevin Hernandez Rostran',10
+     37	      64 6F 20 70 6F 72	3A+
+     38	      20 4B 65 76 69 6E	20+
+     39	      48 65 72 6E 61 6E	64+
+     40	      65 7A 20 52 6F 73	74+
+     41	      72 61 6E 0A
+     42	0098  43 75 72 73 6F 20	20+		     MSG3 DB	    'Curso	  : Arquitectura - Instituto Tecnologico de Costa   +
+     43	      20 20 20 20 20 20	3A+  Rica',10
+     44	      20 41 72 71 75 69	74+
+     45	      65 63 74 75 72 61	20+
+     46	      2D 20 49 6E 73 74	69+
+     47	      74 75 74 6F 20 54	65+
+     48	      63 6E 6F 6C 6F 67	69+
+     49	      63 6F 20 64 65 20	43+
+     50	      6F 73 74 61 20 52	69+
+     51	      63 61 0A
+     52	00DA  45 73 74 65 20 70	72+		     MSG4 DB	    'Este programa consiste en mostrar la animacion mostrada en	la  +
+     53	      6F 67 72 61 6D 61	20+  pelicula Matrix.',10
+     54	      63 6F 6E 73 69 73	74+
+     55	      65 20 65 6E 20 6D	6F+
+     56	      73 74 72 61 72 20	6C+
+     57	      61 20 61 6E 69 6D	61+
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 2
+matrix.ASM
+
+
+
+     58	      63 69 6F 6E 20 6D	6F+
+     59	      73 74 72 61 64 61	20+
+     60	      65 6E 20 6C 61 20	70+
+     61	      65 6C 69 63 75 6C	61+
+     62	      20 4D 61 74 72 69	78+
+     63	      2E 0A
+     64	0129  53 65 20 75 74 69	6C+		     MSG5 DB	    'Se	utiliza	el modo	texto para representar cada caracter.',10
+     65	      69 7A 61 20 65 6C	20+
+     66	      6D 6F 64 6F 20 74	65+
+     67	      78 74 6F 20 70 61	72+
+     68	      61 20 72 65 70 72	65+
+     69	      73 65 6E 74 61 72	20+
+     70	      63 61 64 61 20 63	61+
+     71	      72 61 63 74 65 72	2E+
+     72	      0A
+     73	0162  53 75 20 69 6D 70	6C+		     MSG6 DB	    'Su	implementacion es muy simple y utiliza los siguientes	    +
+     74	      65 6D 65 6E 74 61	63+  comandos:',10
+     75	      69 6F 6E 20 65 73	20+
+     76	      6D 75 79 20 73 69	6D+
+     77	      70 6C 65 20 79 20	75+
+     78	      74 69 6C 69 7A 61	20+
+     79	      6C 6F 73 20 73 69	67+
+     80	      75 69 65 6E 74 65	73+
+     81	      20 63 6F 6D 61 6E	64+
+     82	      6F 73 3A 0A
+     83	01A5  6D 61 74 72 69 78	20+		     MSG7 DB	    'matrix	=> muestra la visualizacion en consola.',10
+     84	      20 20 20 20 3D 3E	20+
+     85	      6D 75 65 73 74 72	61+
+     86	      20 6C 61 20 76 69	73+
+     87	      75 61 6C 69 7A 61	63+
+     88	      69 6F 6E 20 65 6E	20+
+     89	      63 6F 6E 73 6F 6C	61+
+     90	      2E 0A
+     91	01D8  6D 61 74 72 69 78	20+		     MSG8 DB	    'matrix /h => muestra la ayuda del programa.',10
+     92	      2F 68 20 3D 3E 20	6D+
+     93	      75 65 73 74 72 61	20+
+     94	      6C 61 20 61 79 75	64+
+     95	      61 20 64 65 6C 20	70+
+     96	      72 6F 67 72 61 6D	61+
+     97	      2E 0A
+     98	0204  2A 2A 50 61 72 61	20+		     MSG9 DB	    '**Para salir del programa solamente presione la tecla ESC**',10
+     99	      73 61 6C 69 72 20	64+
+    100	      65 6C 20 70 72 6F	67+
+    101	      72 61 6D 61 20 73	6F+
+    102	      6C 61 6D 65 6E 74	65+
+    103	      20 70 72 65 73 69	6F+
+    104	      6E 65 20 6C 61 20	74+
+    105	      65 63 6C 61 20 45	53+
+    106	      43 2A 2A 0A
+    107	0240  2D 2D 2D 2D 2D 2D	2D+		     MSG20 DB									    +
+    108	      2D 2D 2D 2D 2D 2D	2D+  '-------------------------------------------------------------------------------',	10,10,'$'
+    109	      2D 2D 2D 2D 2D 2D	2D+
+    110	      2D 2D 2D 2D 2D 2D	2D+
+    111	      2D 2D 2D 2D 2D 2D	2D+
+    112	      2D 2D 2D 2D 2D 2D	2D+
+    113	      2D 2D 2D 2D 2D 2D	2D+
+    114	      2D 2D 2D 2D 2D 2D	2D+
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 3
+matrix.ASM
+
+
+
+    115	      2D 2D 2D 2D 2D 2D	2D+
+    116	      2D 2D 2D 2D 2D 2D	2D+
+    117	      2D 2D 2D 2D 2D 2D	2D+
+    118	      2D 2D 0A 0A 24
+    119	0292  0A 0A 49 6E 76 61	6C+		     MSGInvalido DB 10,10, 'Invalido', 10,10,'$'
+    120	      69 64 6F 0A 0A 24
+    121	029F			     Datos Ends
+    122
+    123	0000			     Codigo Segment
+    124					     Assume DS:Datos,CS:Codigo,SS:Pila
+    125
+    126	0000			     Inicio:
+    127
+    128				     ;--------------------------------------Ayuda
+    129	0000  33 DB				     Xor Bx, Bx	;para usarlo como apuntador del	PSP
+    130	0002  BE 0082				     Mov SI, 82h ; para	usarlo como apuntador del PSP
+    131	0005  8A 5C FE				     MOV BL, BYTE PTR [SI]-2; Esto es por que no es permitido pasarla direccion	al  +
+    132				     DI	directamente
+    133	0008  32 FF				     Xor Bh, Bh	;para limpiar la parte alta del	registro
+    134
+    135	000A  83 FB 00				     CMP BX,0 ;Compara si no hay ningun	parametro
+    136	000D  74 31				     JE	SEGUIRRUN
+    137						     ; CMP BX,3	     para parametros a mas de 3	char
+    138						     ; JNE INVALIDO
+    139	000F  33 DB				     XOR BX,BX
+    140	0011  BB 0082				     MOV BX,82h
+    141	0014  8B 17				     MOV DX,[BX]
+    142	0016  80 FE 68				     CMP DH,68h	;Es el caracter	después del slash
+    143	0019  74 03				     JE	IMPRIMIR_AYUDA
+    144	001B  EB 12 90				     JMP INVALIDO
+    145	001E			     IMPRIMIR_AYUDA:
+    146	001E  33 C0				     XOR AX,AX
+    147	0020  B8 0000s				     MOV AX,DATOS
+    148	0023  8E D8			     MOV DS,AX
+    149	0025  BA 0009r				     LEA DX,MSG
+    150	0028  B4 09				     MOV AH,09h
+    151	002A  CD 21				     INT 21h
+    152	002C  EB 35 90				     JMP Salir2
+    153
+    154	002F			     INVALIDO:
+    155	002F  33 C0				     XOR AX,AX
+    156	0031  B8 0000s				     MOV AX,DATOS
+    157	0034  8E D8			     MOV DS,AX
+    158	0036  BA 0292r				     LEA DX,MSGInvalido	; carga	mensaje
+    159	0039  B4 09				     MOV AH,09h
+    160	003B  CD 21				     INT 21h
+    161	003D  EB 24 90				     JMP Salir2
+    162
+    163				     ;--------------------------------------------
+    164	0040			     SEGUIRRUN:
+    165	0040  33 C0				     XOR AX,AX
+    166	0042  B8 0000s				     MOV AX,DATOS
+    167	0045  8E D8			     MOV DS,AX
+    168	0047  B8 0000s			     MOV AX,PILA
+    169	004A  8E D0			     MOV SS,AX
+    170	004C  B8 B800			      MOV AX,0B800H
+    171						     ; --Clear Screen
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 4
+matrix.ASM
+
+
+
+    172	004F  8E C0			     MOV ES,AX
+    173	0051  B8 B800				     mov ax,0B800h
+    174	0054  8E C0				     mov es,ax
+    175	0056  33 FF				     xor di,di
+    176	0058  33 C0				     xor ax,ax
+    177	005A  B9 07D0				     mov cx,2000d
+    178	005D  FC				     cld
+    179	005E  F3> AB				     rep stosw
+    180
+    181	0060  E8 0005			     CALL MOVIMIENTO
+    182	0063			     Salir2:
+    183	0063  B8 4C00			     MOV AX, 4C00h
+    184	0066  CD 21			     INT 21h
+    185
+    186	0068			     MOVIMIENTO	PROC NEAR ;se realizan todas las acciones de los caracteres
+    187
+    188	0068			     DESPLEGAR:
+    189	0068  33 C0					     XOR AX,AX
+    190	006A  B0 A0					     MOV AL,160
+    191	006C  F6 26 0000r			     MUL FIL ; calculo de filas
+    192	0070  32 FF				     XOR BH, BH
+    193	0072  80 3E 0006r 0C				     CMP CONTAR_F,12
+    194	0077  74 03					     JE	contar
+    195	0079  EB 1E 90					     JMP contar2
+    196	007C			     contar:
+    197	007C  C6 06 0006r 00				     MOV CONTAR_F,0
+    198	0081  8A DA				     MOV BL, DL	;Columna
+    199	0083  8A CA					     MOV CL,DL
+    200	0085  80 E1 3E					     AND CL,0111110b ;Color del	caracter
+    201	0088  00 0E 0001r				     ADD COL,CL
+    202	008C  8A CA					     MOV CL,DL
+    203	008E  80 E1 0E					     AND CL,00001110b
+    204
+    205	0091  88 0E 0000r				     MOV FIL,CL
+    206	0095  EB D1					     JMP DESPLEGAR
+    207	0097  74 0B					     JE	seguir2
+    208	0099			     contar2:
+    209	0099  8A 1E 0001r				     MOV BL, COL
+    210	009D  FE 06 0006r				     INC CONTAR_F
+    211	00A1  EB 01 90					     JMP seguir2
+    212
+    213	00A4			     seguir2:
+    214	00A4  D1 E3				     SHL BX,1
+    215	00A6  03 D8				 ADD BX,AX
+    216	00A8  80 3E 0000r 03			     CMP FIL,3
+    217	00AD  74 03				     JE	CONTINUAR
+    218	00AF  EB 05 90				     JMP CONTINUAR2
+    219	00B2			     CONTINUAR:
+    220	00B2  B4 8F				     MOV AH,08Fh
+    221	00B4  74 02				     JE	SEGUIR
+    222	00B6			     CONTINUAR2:
+    223	00B6  B4 0F				     MOV AH,00FH
+    224
+    225	00B8			     SEGUIR:
+    226	00B8  33 C9				     XOR CX,CX
+    227
+    228
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 5
+matrix.ASM
+
+
+
+    229	00BA  26: 89 07				     MOV WORD PTR ES:[BX],AX	 ; Ponemos el caracter en pantalla
+    230	00BD  8B 0E 0002r		     MOV CX, PAUSA1	  ;Pausa de movimiento
+    231	00C1  51		     P1:     PUSH CX
+    232	00C2  8B 0E 0004r		     MOV CX, PAUSA2
+    233	00C6  90		     P2:     NOP
+    234	00C7  E2 FD			     LOOP P2
+    235	00C9  59			     POP CX
+    236	00CA  E2 F5			     LOOP P1
+    237
+    238						     ;MOV DH,001010b ; Cambia el Background del	char que queda impreso,	a verde	con +
+    239				     OAh
+    240										;otra forma: MOV DH,00001111b B-RGB-I-RGB; con B=   +
+    241				     blinking I= intensidad
+    242	00CC  8A C2				     MOV AL,DL
+    243	00CE  24 0A				     AND AL,00001010b
+    244	00D0  3C 00				     CMP AL,0b
+    245	00D2  74 03				     JE	CONTINUAR3
+    246	00D4  EB 05 90				     JMP CONTINUAR4
+    247	00D7			     CONTINUAR3:
+    248	00D7  B6 0E				     MOV DH,00001110b
+    249	00D9  74 02				     JE	SEGUIR3
+    250	00DB			     CONTINUAR4:
+    251	00DB  B6 0E				     MOV DH,00001110b
+    252	00DD			     SEGUIR3:
+    253	00DD  26: 89 17			     MOV WORD PTR ES:[BX],DX	; Borra	el caracter
+    254
+    255
+    256
+    257	00E0			     salecolor:
+    258
+    259
+    260						     ;INTERRUPCION DE TECLADO
+    261	00E0  B4 01				     MOV AH,01H
+    262	00E2  CD 16				     INT 16H
+    263	00E4  74 03				     JZ	CUATRO
+    264	00E6  EB 36 90				     JMP HAYTECLA
+    265
+    266				     ;MUEVE EL caracter
+    267	00E9  80 3E 0000r 18	     CUATRO: CMP FIL,24
+    268	00EE  74 19			     JE	CD4A
+    269	00F0  FE 06 0000r		     INC FIL
+    270						     ;RANDOM
+    271	00F4  B4 2C				     mov ah, 2ch  ; Se obtiene la fecha	del sistema
+    272	00F6  CD 21				     int 21h
+    273	00F8  8B C2				     mov ax, dx	  ; DH=segundos, DL=milisegundos
+    274	00FA  25 000F				     and ax, 0Fh  ; mantiene los ultimos 4 digitos necesarios para el random
+    275	00FD  33 C0				     XOR AX,AX
+    276	00FF			     varMenor:
+    277						     ;FIN RANDOM
+    278	00FF  80 3E 0001r 4F		     CMP COL,79
+    279	0104  74 10			     JE	CD4B
+    280	0106  EB 1E 90			     JMP REPETIR
+    281	0109  80 06 0001r 01	     CD4A:   ADD COL,1
+    282	010E  C6 06 0000r 00			     MOV FIL,0
+    283	0113  EB 11 90			     JMP REPETIR
+    284	0116  C6 06 0001r 00	     CD4B:   MOV COL, 0
+    285	011B  EB 09 90				     JMP REPETIR
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 6
+matrix.ASM
+
+
+
+    286
+    287				     ;------------------------------------------------------------------------
+    288				     ;PROCESA LA TECLA DE FUNCION EXTENDIDA
+    289	011E  32 E4		     HAYTECLA:		     XOR AH,AH
+    290	0120  CD 16					     INT 16H
+    291	0122  3C 1B					     CMP AL,27	     ;SI ES ESC
+    292	0124  74 03					     JZ	SALIR
+    293
+    294	0126  E9 FF3F		     REPETIR: JMP DESPLEGAR
+    295
+    296	0129  C3		     SALIR:  RET
+    297
+    298	012A			     MOVIMIENTO	ENDP
+    299
+    300	012A			     Codigo ENDS
+    301				     END Inicio
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 7
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "11/24/14"
+??FILENAME			  Text	 "matrix  "
+??TIME				  Text	 "13:15:16"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 MATRIX
+@WORDSIZE			  Text	 2
+CAMB_BG				  Byte	 DATOS:0007
+CD4A				  Near	 CODIGO:0109
+CD4B				  Near	 CODIGO:0116
+COL				  Byte	 DATOS:0001
+CONTAR				  Near	 CODIGO:007C
+CONTAR2				  Near	 CODIGO:0099
+CONTAR_F			  Byte	 DATOS:0006
+CONTINUAR			  Near	 CODIGO:00B2
+CONTINUAR2			  Near	 CODIGO:00B6
+CONTINUAR3			  Near	 CODIGO:00D7
+CONTINUAR4			  Near	 CODIGO:00DB
+CUATRO				  Near	 CODIGO:00E9
+DESPLEGAR			  Near	 CODIGO:0068
+FIL				  Byte	 DATOS:0000
+FLAG				  Byte	 DATOS:0008
+HAYTECLA			  Near	 CODIGO:011E
+IMPRIMIR_AYUDA			  Near	 CODIGO:001E
+INICIO				  Near	 CODIGO:0000
+INVALIDO			  Near	 CODIGO:002F
+MOVIMIENTO			  Near	 CODIGO:0068
+MSG				  Byte	 DATOS:0009
+MSG1				  Byte	 DATOS:005B
+MSG2				  Byte	 DATOS:0071
+MSG20				  Byte	 DATOS:0240
+MSG3				  Byte	 DATOS:0098
+MSG4				  Byte	 DATOS:00DA
+MSG5				  Byte	 DATOS:0129
+MSG6				  Byte	 DATOS:0162
+MSG7				  Byte	 DATOS:01A5
+MSG8				  Byte	 DATOS:01D8
+MSG9				  Byte	 DATOS:0204
+MSGINVALIDO			  Byte	 DATOS:0292
+P1				  Near	 CODIGO:00C1
+P2				  Near	 CODIGO:00C6
+PAUSA1				  Word	 DATOS:0002
+PAUSA2				  Word	 DATOS:0004
+REPETIR				  Near	 CODIGO:0126
+SALECOLOR			  Near	 CODIGO:00E0
+SALIR				  Near	 CODIGO:0129
+SALIR2				  Near	 CODIGO:0063
+SEGUIR				  Near	 CODIGO:00B8
+SEGUIR2				  Near	 CODIGO:00A4
+SEGUIR3				  Near	 CODIGO:00DD
+SEGUIRRUN			  Near	 CODIGO:0040
+VARMENOR			  Near	 CODIGO:00FF
+Turbo Assembler	 Version 4.1	    11/24/14 13:15:16	    Page 8
+Symbol Table
+
+
+
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  012A Para	  none
+DATOS				  16  029F Para	  none
+PILA				  16  1000 Para	  Stack	  STACK
+

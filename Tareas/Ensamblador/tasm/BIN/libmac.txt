@@ -1,0 +1,32 @@
+Limpiar Macro Atributo,fila,columna
+	mov ax,0600h
+	mov bh,atributo
+	xor cx,cx
+	mov dh,fila
+	mov dl,columna
+	int 10h
+EndM
+
+ImprimirCaracter Macro caracter
+	mov ah,02h
+	mov dl,caracter
+	int 21h
+EndM
+
+Keypressed Macro tecla
+	mov ax,0000h
+	int 16h
+	mov tecla,al
+EndM
+
+LeeTecla Macro tecla
+	mov ax,0100h
+	int 21h
+	mov tecla,al
+EndM
+
+ImprimeCadena Macro texto
+	mov ax,0100h
+	int 21h
+	mov tecla,al
+EndM

@@ -1,0 +1,118 @@
+Turbo Assembler	 Version 4.1	    09/25/14 11:00:23	    Page 1
+proof.ASM
+
+
+
+      1	0000			     datos segment
+      2	0000  56 49 52 55 53 0A	0D+	     mensaje db	"VIRUS",10,13,"$" ;Para	imprimir $ pongo el ascii 24h
+      3	      24
+      4	0008  41 42 43 44 45 46		     tablahex db "ABCDEF"
+      5	000E  ??			     var2 db ?
+      6	000F  54 75 61 6E 69 73	0A+	     tua db "Tuanis",10,13,"$"
+      7	      0D 24
+      8
+      9	0018  14			     FIL DB 20
+     10	0019  32			     COL DB 50
+     11	001A  04			     DIR DB 4
+     12	001B  2A 0A			     ASTERIX DB	'*',0AH	  ; Fondo negro	y asterisco verde CLARO
+     13	001D  03E8			     PAUSA1 dw 1000
+     14	001F  03E8			     PAUSA2 dw 1000 ; En total hace de pausa 10000x2000=20 000 000 de nops
+     15
+     16	0021			     datos EndS
+     17
+     18	0000			     codigo Segment
+     19
+     20				     Enigma Macro Param, Num
+     21					     mov cx,Num
+     22				     Param:
+     23					     push cx
+     24					     xor dx,dx
+     25					     mov dx,offset tua
+     26					     mov ah,09h
+     27					     int 21h
+     28					     pop cx
+     29					     loop Param
+     30				     EndM
+     31
+     32
+     33	0000			     comienceaqui:
+     34					     Assume cs:codigo, ds:datos
+     35
+     36	0000  33 C0			     xor ax,ax
+     37	0002  B8 0000s			     mov ax,Datos
+     38	0005  8E D8			     mov Ds,Ax
+     39
+     40	0007  33 D2			     xor dx, dx
+     41
+     42	0009  BA 0000r			     mov dx,offset mensaje
+     43	000C  B4 09			     mov ah,09h
+     44	000E  CD 21			     int 21h
+     45
+     46					     ;mov ah,01h
+     47					     ;int 21h
+     48					     ;mov var2,al
+     49
+     50	0010  8A 16 000Er		     mov dl,var2
+     51	0014  B4 09			     mov ah,09h
+     52	0016  CD 21			     int 21h
+     53
+     54					     Enigma A,11h
+1    55	0018  B9 0011			     mov cx,11h
+1    56	001B			     A:
+1    57	001B  51			     push cx
+Turbo Assembler	 Version 4.1	    09/25/14 11:00:23	    Page 2
+proof.ASM
+
+
+
+1    58	001C  33 D2			     xor dx,dx
+1    59	001E  BA 000Fr			     mov dx,offset tua
+1    60	0021  B4 09			     mov ah,09h
+1    61	0023  CD 21			     int 21h
+1    62	0025  59			     pop cx
+1    63	0026  E2 F3			     loop A
+     64
+     65
+     66	0028  B8 4C00			     mov ax,4c00h
+     67	002B  CD 21			     int 21h
+     68
+     69	002D			     codigo EndS
+     70				     End comienceaqui
+Turbo Assembler	 Version 4.1	    09/25/14 11:00:23	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/25/14"
+??FILENAME			  Text	 "proof	  "
+??TIME				  Text	 "11:00:23"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 PROOF
+@WORDSIZE			  Text	 2
+A				  Near	 CODIGO:001B
+ASTERIX				  Byte	 DATOS:001B
+COL				  Byte	 DATOS:0019
+COMIENCEAQUI			  Near	 CODIGO:0000
+DIR				  Byte	 DATOS:001A
+FIL				  Byte	 DATOS:0018
+MENSAJE				  Byte	 DATOS:0000
+PAUSA1				  Word	 DATOS:001D
+PAUSA2				  Word	 DATOS:001F
+TABLAHEX			  Byte	 DATOS:0008
+TUA				  Byte	 DATOS:000F
+VAR2				  Byte	 DATOS:000E
+
+Macro Name
+
+ENIGMA
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  002D Para	  none
+DATOS				  16  0021 Para	  none
+

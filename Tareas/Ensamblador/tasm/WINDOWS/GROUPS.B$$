@@ -1,0 +1,14 @@
+[group1]
+caption=Borland Tasm 4.0
+file=TASM40.GRP
+[icons1]
+TASM.HLP=A:\BIN,Tasm Reference, HELP.ICO
+TDW.EXE=A:\BIN,Turbo Debugger for Windows, TDW.ICO
+TDWINST.EXE=A:\BIN,TDW Configuration, TDWINST.ICO
+WREMOTE.EXE=A:\BIN,Remote Debugging
+WRSETUP.EXE=A:\BIN,Remote Setup
+TD.PIF=A:\BIN,Turbo Debugger for DOS, TDDOS.ICO
+TDINST.EXE=A:\BIN,TD Configuration, TDOSINST.ICO
+TD32.EXE=A:\BIN,Turbo Debugger for Win32, TD32.ICO
+TD32INST.EXE=A:\BIN,TD32 Configuration, TD32INST.ICO
+TDWINI.EXE=A:\BIN,TD Video Configuration

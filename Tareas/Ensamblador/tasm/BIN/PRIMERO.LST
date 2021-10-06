@@ -1,0 +1,80 @@
+Turbo Assembler	 Version 4.1	    06/04/14 10:14:05	    Page 1
+primero.ASM
+
+
+
+      1	0000			     Pila Segment
+      2
+      3	0000  40*(50 69	6C 61)		  db 64	Dup ('Pila')
+      4
+      5	0100			     Pila EndS
+      6
+      7	0000			     Datos Segment
+      8
+      9	0000  48 6F 6C 61 20 4D	75+	  Mensaje   db 'Hola Mundo '
+     10	      6E 64 6F 20
+     11	000B  66 65 6E 6F 6D 65	6E+	      Mensaje2	db 'fenomeno dia... '
+     12	      6F 20 64 69 61 2E	2E+
+     13	      2E 20
+     14	001B  05			      var1	db 5
+     15	001C  02			      var2	db 2
+     16	001D  ??			      var3	db ?
+     17
+     18	001E			     Datos EndS
+     19
+     20	0000			     Codigo Segment
+     21	0000			      Inicio:
+     22					   Assume CS:Codigo, DS:Datos, SS:Pila
+     23
+     24
+     25	0000  33 C9			    xor	   cx,cx
+     26	0002  B9 0000s			    mov	   cx,Datos
+     27	0005  8E D9			    mov	   DS,cx
+     28
+     29					    ;aqui va el	código de instrucciones
+     30					    ;del programa.
+     31
+     32	0007  8A 26 001Br			mov ah,var1
+     33	000B  A0 001Cr				mov al,var2
+     34	000E  02 E0				add ah,al    ;se guarda	el resultado en	el primer operando
+     35	0010  88 26 001Dr			mov var3,ah
+     36
+     37	0014  B4 09				mov ah,	09h  ;Mostar lo	que tiene mensaje en ventana
+     38	0016  BA 0000r				mov dx,	offset mensaje
+     39	0019  CD 21				int 21h
+     40
+     41
+     42	001B  33 C0				xor ax,ax	     ;prepara el ah y al para la int 21h 4c00h.
+     43	001D  B8 4C00			    mov	ax,4c00h     ;int 21h ah=4ch al=00h
+     44	0020  CD 21			    int	21h		     ;ejecute DOS. (termine el programa	con codigo 00).
+     45	0022			     Codigo EndS
+     46					  End Inicio
+Turbo Assembler	 Version 4.1	    06/04/14 10:14:05	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "06/04/14"
+??FILENAME			  Text	 "primero "
+??TIME				  Text	 "10:14:05"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 PRIMERO
+@WORDSIZE			  Text	 2
+INICIO				  Near	 CODIGO:0000
+MENSAJE				  Byte	 DATOS:0000
+MENSAJE2			  Byte	 DATOS:000B
+VAR1				  Byte	 DATOS:001B
+VAR2				  Byte	 DATOS:001C
+VAR3				  Byte	 DATOS:001D
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0022 Para	  none
+DATOS				  16  001E Para	  none
+PILA				  16  0100 Para	  none
+

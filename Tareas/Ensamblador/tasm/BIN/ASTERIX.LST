@@ -1,0 +1,244 @@
+Turbo Assembler	 Version 4.1	    11/05/14 11:18:30	    Page 1
+asterix.ASM
+
+
+
+      1				     ; ***************************************************
+      2				     ; Asterisco rebotador en la pantalla
+      3				     ; ***************************************************
+      4
+      5	0000			     Pila Segment Stack	'Stack'
+      6	0000  0800*(????)		     dw	2048 dup(?)
+      7	1000			     Pila Ends
+      8
+      9	0000			     Datos Segment
+     10	0000  14			     FIL DB 20
+     11	0001  32			     COL DB 50
+     12	0002  04			     DIR DB 4
+     13	0003  2A 0A			     ASTERIX DB	'*',0AH	  ; Fondo negro	y asterisco verde CLARO
+     14	0005  03E8			     PAUSA1 dw 1000
+     15	0007  03E8			     PAUSA2 dw 1000 ; En total hace de pausa 10000x2000=20 000 000 de nops
+     16	0009			     Datos Ends
+     17
+     18	0000			     Codigo Segment
+     19					     Assume DS:Datos,CS:Codigo,SS:Pila
+     20
+     21	0000  B8 0000s		     Inicio: MOV AX,DATOS
+     22	0003  8E D8			     MOV DS,AX
+     23	0005  B8 0000s			     MOV AX,PILA
+     24	0008  8E D0			     MOV SS,AX
+     25
+     26				     ;	     MOV AX, 3
+     27				     ;	     INT 10H	     ;Interrupcion de pantalla (BIOS)
+     28
+     29	000A  B8 B800			     MOV AX,0B800H
+     30	000D  8E C0			     MOV ES,AX
+     31	000F  E8 0005			     CALL MOVIMIENTO
+     32	0012  B8 4C00			     MOV AX, 4C00h
+     33	0015  CD 21			     INT 21h
+     34
+     35	0017			     MOVIMIENTO	PROC NEAR
+     36				     ; Este procedimiento pone el asterisco, hace una pasua y lo mueve un campo
+     37
+     38	0017  B0 A0		     DESPLEGAR:	     MOV AL,160		  ; Calculamos BX = FIL*160+Col*2
+     39	0019  F6 26 0000r			     MUL FIL
+     40	001D  32 FF				     XOR BH, BH
+     41	001F  8A 1E 0001r			     MOV BL, COL
+     42	0023  D1 E3				     SHL BX,1
+     43	0025  03 D8				     ADD BX,AX
+     44
+     45
+     46
+     47					     ;MOV DX,WORD PTR ES:[BX]	  ; Salvamos lo	que hay	en la pantalla
+     48	0027  A1 0003r			     MOV AX,WORD PTR ASTERIX	 ; Movemos al AX el asterisco
+     49	002A  26: 89 07			     MOV WORD PTR ES:[BX],AX	 ; Ponemos el asterisco	en pantalla
+     50
+     51
+     52	002D  8B 0E 0005r		     MOV CX, PAUSA1	  ; Hacemos una	pausa de 100 x 1000 nops
+     53	0031  51		     P1:     PUSH CX
+     54	0032  8B 0E 0007r		     MOV CX, PAUSA2
+     55	0036  90		     P2:     NOP
+     56	0037  E2 FD			     LOOP P2
+     57	0039  59			     POP CX
+Turbo Assembler	 Version 4.1	    11/05/14 11:18:30	    Page 2
+asterix.ASM
+
+
+
+     58	003A  E2 F5			     LOOP P1
+     59
+     60	003C  26: 89 17			     MOV WORD PTR ES:[BX],DX	; Borramos el asterisco
+     61
+     62
+     63	003F  80 3E 0004r 0F		cmp asterix+1,15
+     64	0044  74 03			je ponecolor0
+     65	0046  EB 06 90			jmp salecolor
+     66	0049  C6 06 0004r 00	     ponecolor0: mov asterix+1,	0
+     67	004E			     salecolor:
+     68
+     69
+     70						     ;INTERRUPCION DE TECLADO
+     71	004E  B4 01				     MOV AH,01H
+     72	0050  CD 16				     INT 16H
+     73	0052  74 03				     JZ	ALGOR
+     74	0054  E9 00C2				     JMP HAYTECLA
+     75
+     76				     ;----------------------------MUEVE	EL ASTERISCO---------------------------
+     77	0057  80 3E 0002r 04	     ALGOR:	CMP DIR, 4	; Con saltos de	conejo pues ya da fuera	de rango
+     78	005C  75 03				JNE PREGUNTE5
+     79	005E  E9 008F				JMP CUATRO
+     80	0061  80 3E 0002r 05	     PREGUNTE5:	CMP DIR, 5
+     81	0066  75 03				JNE PREGUNTE6
+     82	0068  EB 5D 90				JMP CINCO
+     83	006B  80 3E 0002r 06	     PREGUNTE6:	CMP DIR, 6
+     84	0070  75 03				JNE SIETE
+     85	0072  EB 2A 90				JMP SEIS
+     86
+     87	0075  80 3E 0000r 00	     SIETE:  CMP FIL,0
+     88	007A  74 12			     JE	CD7A   ; Cambio	la direccion a 6
+     89	007C  FE 0E 0000r		     DEC FIL
+     90	0080  80 3E 0001r 4F		     CMP COL,79
+     91	0085  74 0F			     JE	CD7B   ; Cambio	la direccion a 4
+     92	0087  FE 06 0001r		     INC COL
+     93	008B  E9 00CE			     JMP REPETIR
+     94	008E  C6 06 0002r 06	     CD7A:   MOV DIR, 6
+     95	0093  E9 00C6			     JMP REPETIR
+     96	0096  C6 06 0002r 04	     CD7B:   MOV DIR, 4
+     97	009B  E9 00BE			     JMP REPETIR
+     98
+     99	009E  80 3E 0000r 18	     SEIS:   CMP FIL,24
+    100	00A3  74 12			     JE	CD6A   ; Cambio	la direccion a 7
+    101	00A5  FE 06 0000r		     INC FIL
+    102	00A9  80 3E 0001r 4F		     CMP COL,79
+    103	00AE  74 0F			     JE	CD6B   ; Cambio	la direccion a 5
+    104	00B0  FE 06 0001r		     INC COL
+    105	00B4  E9 00A5			     JMP REPETIR
+    106	00B7  C6 06 0002r 07	     CD6A:   MOV DIR, 7
+    107	00BC  E9 009D			     JMP REPETIR
+    108	00BF  C6 06 0002r 05	     CD6B:   MOV DIR, 5
+    109	00C4  E9 0095			     JMP REPETIR
+    110
+    111	00C7  80 3E 0000r 18	     CINCO:  CMP FIL,24
+    112	00CC  74 12			     JE	CD5A   ; Cambio	la direccion a 4
+    113	00CE  FE 06 0000r		     INC FIL
+    114	00D2  80 3E 0001r 00		     CMP COL,0
+Turbo Assembler	 Version 4.1	    11/05/14 11:18:30	    Page 3
+asterix.ASM
+
+
+
+    115	00D7  74 0F			     JE	CD5B   ; Cambio	la direccion a 6
+    116	00D9  FE 0E 0001r		     DEC COL
+    117	00DD  EB 7D 90			     JMP REPETIR
+    118	00E0  C6 06 0002r 04	     CD5A:   MOV DIR, 4
+    119	00E5  EB 75 90			     JMP REPETIR
+    120	00E8  C6 06 0002r 06	     CD5B:   MOV DIR, 6
+    121	00ED  EB 6D 90			     JMP REPETIR
+    122
+    123	00F0  80 3E 0000r 00	     CUATRO: CMP FIL,0
+    124	00F5  74 12			     JE	CD4A   ; Cambio	la direccion a 5
+    125	00F7  FE 0E 0000r		     DEC FIL
+    126	00FB  80 3E 0001r 00		     CMP COL,0
+    127	0100  74 0F			     JE	CD4B   ; Cambio	la direccion a 7
+    128	0102  FE 0E 0001r		     DEC COL
+    129	0106  EB 54 90			     JMP REPETIR
+    130	0109  C6 06 0002r 05	     CD4A:   MOV DIR, 5
+    131	010E  EB 4C 90			     JMP REPETIR
+    132	0111  C6 06 0002r 07	     CD4B:   MOV DIR, 7
+    133	0116  EB 44 90				     JMP REPETIR
+    134
+    135				     ;------------------------------------------------------------------------
+    136				     ;PROCESA LA TECLA DE FUNCION EXTENDIDA
+    137	0119  32 E4		     HAYTECLA:		     XOR AH,AH
+    138	011B  CD 16					     INT 16H
+    139	011D  3C 1B					     CMP AL,27	     ;SI ES ESC
+    140	011F  74 3E					     JZ	SALIR
+    141
+    142	0121  3C 00					     CMP AL,0
+    143	0123  74 03					     JZ	REVISE_DIR
+    144	0125  E9 FF2F					     JMP ALGOR
+    145
+    146	0128  80 FC 47		     REVISE_DIR:     CMP AH,47H	     ;SI ES HOME
+    147	012B  75 08					     JNE S1
+    148	012D  C6 06 0002r 04				     MOV DIR,4
+    149	0132  E9 FEE2					     JMP DESPLEGAR
+    150	0135  80 FC 49				     S1:     CMP AH,49H	     ;SI ES PG UP
+    151	0138  75 08					     JNZ S2
+    152	013A  C6 06 0002r 07				     MOV DIR,7
+    153	013F  E9 FED5					     JMP DESPLEGAR
+    154	0142  80 FC 4F				     S2:     CMP AH,4FH	     ;SI ES END
+    155	0145  75 08					     JNZ S3
+    156	0147  C6 06 0002r 05				     MOV DIR,5
+    157	014C  E9 FEC8					     JMP DESPLEGAR
+    158	014F  80 FC 51				     S3:     CMP AH,51H	     ;SI ES PG DN
+    159	0152  74 03					     JE	S4
+    160	0154  E9 FF00					     JMP ALGOR
+    161	0157  C6 06 0002r 06			     S4:     MOV DIR,6
+    162
+    163	015C  E9 FEB8		     REPETIR: JMP DESPLEGAR
+    164
+    165	015F  C3		     SALIR:  RET
+    166
+    167	0160			     MOVIMIENTO	ENDP
+    168
+    169	0160			     Codigo ENDS
+    170				     END Inicio
+Turbo Assembler	 Version 4.1	    11/05/14 11:18:30	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "11/05/14"
+??FILENAME			  Text	 "asterix "
+??TIME				  Text	 "11:18:30"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 ASTERIX
+@WORDSIZE			  Text	 2
+ALGOR				  Near	 CODIGO:0057
+ASTERIX				  Byte	 DATOS:0003
+CD4A				  Near	 CODIGO:0109
+CD4B				  Near	 CODIGO:0111
+CD5A				  Near	 CODIGO:00E0
+CD5B				  Near	 CODIGO:00E8
+CD6A				  Near	 CODIGO:00B7
+CD6B				  Near	 CODIGO:00BF
+CD7A				  Near	 CODIGO:008E
+CD7B				  Near	 CODIGO:0096
+CINCO				  Near	 CODIGO:00C7
+COL				  Byte	 DATOS:0001
+CUATRO				  Near	 CODIGO:00F0
+DESPLEGAR			  Near	 CODIGO:0017
+DIR				  Byte	 DATOS:0002
+FIL				  Byte	 DATOS:0000
+HAYTECLA			  Near	 CODIGO:0119
+INICIO				  Near	 CODIGO:0000
+MOVIMIENTO			  Near	 CODIGO:0017
+P1				  Near	 CODIGO:0031
+P2				  Near	 CODIGO:0036
+PAUSA1				  Word	 DATOS:0005
+PAUSA2				  Word	 DATOS:0007
+PONECOLOR0			  Near	 CODIGO:0049
+PREGUNTE5			  Near	 CODIGO:0061
+PREGUNTE6			  Near	 CODIGO:006B
+REPETIR				  Near	 CODIGO:015C
+REVISE_DIR			  Near	 CODIGO:0128
+S1				  Near	 CODIGO:0135
+S2				  Near	 CODIGO:0142
+S3				  Near	 CODIGO:014F
+S4				  Near	 CODIGO:0157
+SALECOLOR			  Near	 CODIGO:004E
+SALIR				  Near	 CODIGO:015F
+SEIS				  Near	 CODIGO:009E
+SIETE				  Near	 CODIGO:0075
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0160 Para	  none
+DATOS				  16  0009 Para	  none
+PILA				  16  1000 Para	  Stack	  STACK
+

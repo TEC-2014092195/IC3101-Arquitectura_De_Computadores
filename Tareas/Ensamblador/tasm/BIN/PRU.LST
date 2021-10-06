@@ -1,0 +1,124 @@
+Turbo Assembler	 Version 4.1	    10/29/14 16:58:13	    Page 1
+pru.ASM
+
+
+
+      1	0000			     Pila Segment PARA Stack 'stack'
+      2	0000  14*(??)			     db	20 Dup(?)
+      3	0014			     Pila EndS
+      4
+      5	0000			     Datos Segment PARA	'data'
+      6	0000  00			     num1 db 0000000000	;99999
+      7	0001  00			     num2 db 0000000000	;99999
+      8	0002			     Datos EndS
+      9
+     10
+     11	0000			     Codigo Segment PARA 'code'
+     12
+     13	0000			     Start:
+     14				     Assume DS:Datos,CS:Codigo,SS:Pila
+     15
+     16				     ; CARGA LOS REGISTROS CON LAS DIRECCIONES PERTINENTES PARA	INVERTID LOS NUMEROS
+     17	0000  33 DB			     Xor Bx, Bx	;para usarlo como apuntador del	PSP
+     18	0002  BE 0082			     Mov SI, 82h ; para	usarlo como apuntador del PSP
+     19	0005  8A 5C FE			     MOV BL, BYTE PTR [SI]-2; Esto es por que no es permitido pasarla direccion	al DI	    +
+     20				     directamente
+     21	0008  32 FF			     Xor Bh, Bh	;para limpiar la parte alta del	registro
+     22
+     23	000A  83 FB 00			     CMP Bx, 0 ; estas 2 instrucciones me permiten salir si no se introdujeron parametros en+
+     24				     la	linea de comandos
+     25						     ;(DEBE DE SER MOSTRAR EL AYUDA NO SALIR), Ademas falta que	tire la	ayuda si el +
+     26				     numero de parametros
+     27						     ;es superior a lo permitido osea mas de 12
+     28	000D  74 19			     JE	CS:Salir  ; si no se insertan parametros en la linea de	comandos
+     29	000F  83 FB 0C			     CMP Bx, 0Ch ; me permite saber si el numero de caracteres es mas de los permitidos	en  +
+     30				     el	psp
+     31	0012  74 14			     JE	CS:Salir ; si es igual me lo envia a Salir por que el numero de	parametros es mayor +
+     32				     de	los permitidos (_99999_99999)
+     33								     ; debe de ser en lugar de Salir tirar el ayuda
+     34
+     35	0014  8B FB			     Mov DI, Bx	; para guardar la posicion del final del PSP y liberar el retgistro BX para +
+     36				     otras operaciones
+     37	0016  BA 0024			     Mov Dx, 24h ;valor	ASCII del dolar	en hexadecimal
+     38	0019  89 95 0081		     Mov [DI+81h],Dx ; pone en la ultima posicion del psp el valor del ASCII $
+     39
+     40					     ;Mov Dx, 82h ; pone la direccion apartir de la cual la funcion 09 empezara	a imprimir
+     41					     ;Mov Ah, 09 ; imprime de la posicion 82h hasta la posicio donde encuentre el valor	    +
+     42				     ASCII del $
+     43					     ;Int 21h
+     44
+     45				     ;TERMINA  DE IMPRIMIR LOS NUMEROS NORMALES	Y DE CARGAR
+     46				     ;-----------------------------------------------------------------------------------------------
+     47				     --------------------------------
+     48
+     49				     ;_______________________________________________________________________________
+     50				     ;Ciclo que	me invierte los	parametros introducidos	en el psp
+     51					     ; Este requiere que se ternga el numero de	caracteres introducidos	por la linea de	    +
+     52				     comandos en el Registro DI
+     53					     ;Ademas de	que se debe de tener guardado en el SI la posicion 82h
+     54					     ; Descripcion:
+     55						     ; Toma a SI y DI como punteros de inico de	caracteres y fin de carateres en el +
+     56				     psp
+     57						     ;Cambia sus valores hasta que el DI sea menor o igual a SI
+Turbo Assembler	 Version 4.1	    10/29/14 16:58:13	    Page 2
+pru.ASM
+
+
+
+     58	001D  81 C7 0080		     Add DI, 80h ;para almacenar la ultima posicion del	psp
+     59
+     60					     ; Ciclo_Invertir:
+     61						     ; CMP DI, SI
+     62						     ; JLE invertidos
+     63						     ; Mov Cl,Byte PTR[SI]
+     64						     ; Mov Dl, Byte PTR[DI]
+     65						     ; Mov [DI], Cl
+     66						     ; Mov [SI], Dl
+     67						     ; Inc SI
+     68						     ; Dec DI
+     69						     ; JMP Ciclo_Invertir
+     70					     ; Invertidos:
+     71	0021  BA 0082			     Mov Dx, 82h ; pone	la direccion apartir de	la cual	la funcion 09 empezara a imprimir
+     72	0024  B4 09			     Mov Ah, 09	; imprime de la	posicion 82h hasta la posicio donde encuentre el valor ASCII+
+     73				     del $
+     74	0026  CD 21			     Int 21h
+     75
+     76				     ;Ciclo que	me invierte los	parametros introducidos	en el psp
+     77				     ;_______________________________________________________________________________
+     78
+     79				     ;_______________________________________________________________________________
+     80
+     81
+     82	0028			     Salir:
+     83	0028  B8 4C00			     Mov Ax,4C00h
+     84	002B  CD 21			     Int 21h
+     85
+     86	002D			     Codigo Ends
+     87				     END Start ; termina en este punto e inicia	en la etiqueta Start
+Turbo Assembler	 Version 4.1	    10/29/14 16:58:13	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/29/14"
+??FILENAME			  Text	 "pru	  "
+??TIME				  Text	 "16:58:13"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 PRU
+@WORDSIZE			  Text	 2
+NUM1				  Byte	 DATOS:0000
+NUM2				  Byte	 DATOS:0001
+SALIR				  Near	 CODIGO:0028
+START				  Near	 CODIGO:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  002D Para	  none	  CODE
+DATOS				  16  0002 Para	  none	  DATA
+PILA				  16  0014 Para	  Stack	  STACK
+

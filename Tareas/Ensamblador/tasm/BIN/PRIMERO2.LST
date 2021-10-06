@@ -1,0 +1,156 @@
+Turbo Assembler	 Version 4.1	    06/06/14 11:03:51	    Page 1
+primero2.ASM
+
+
+
+      1	0000			     Pila Segment
+      2
+      3	0000  40*(50 69	6C 61)		  db 64	Dup ('Pila')
+      4
+      5	0100			     Pila EndS
+      6
+      7	0000			     Datos Segment
+      8
+      9	0000  48 6F 6C 61 20 4D	75+	  Mensaje   db 'Hola Mundo'
+     10	      6E 64 6F
+     11	000A  66 65 6E 6F 6D 65	6E+	      Mensaje2	db 'fenomeno dia... $'
+     12	      6F 20 64 69 61 2E	2E+
+     13	      2E 20 24
+     14	001B  0A 0A 0D 0D 44 69	67+	      repitalo db 10,10,13,13,'Digite algo o s p/salir... ',10,13,'$'
+     15	      69 74 65 20 61 6C	67+
+     16	      6F 20 6F 20 73 20	70+
+     17	      2F 73 61 6C 69 72	2E+
+     18	      2E 2E 20 0A 0D 24
+     19	003D  05			      var1	db 5
+     20	003E  02			      var2	db 2
+     21	003F  ??			      var3	db ?
+     22	0040  ??			      tecla	db ?
+     23	0041  FF*(??)			      vectorAscii db 255 dup(?)
+     24
+     25	0140			     Datos EndS
+     26
+     27
+     28				     include libmac.khr
+1    29				     Limpiar Macro Atributo,fila,columna
+1    30					     mov ax,0600h
+1    31					     mov bh,atributo
+1    32					     xor cx,cx
+1    33					     mov dh,fila
+1    34					     mov dl,columna
+1    35					     int 10h
+1    36				     EndM
+1    37
+1    38				     ImprimirCaracter Macro caracter
+1    39					     mov ah,02h
+1    40					     mov dl,caracter
+1    41					     int 21h
+1    42				     EndM
+1    43
+1    44				     Keypressed	Macro tecla
+1    45					     mov ax,0000h
+1    46					     int 16h
+1    47					     mov tecla,al
+1    48				     EndM
+1    49
+1    50				     LeeTecla Macro tecla
+1    51					     mov ax,0100h
+1    52					     int 21h
+1    53					     mov tecla,al
+1    54				     EndM
+1    55
+1    56				     ImprimeCadena Macro texto
+1    57					     mov ax,0100h
+Turbo Assembler	 Version 4.1	    06/06/14 11:03:51	    Page 2
+primero2.ASM
+
+
+
+1    58					     int 21h
+1    59					     mov tecla,al
+1    60				     EndM
+     61	0000			     Codigo Segment
+     62	0000			      Inicio:
+     63					   Assume CS:Codigo, DS:Datos, SS:Pila
+     64
+     65
+     66	0000  33 C9			    xor	   cx,cx
+     67	0002  B9 0000s			    mov	   cx,Datos
+     68	0005  8E D9			    mov	   DS,cx
+     69
+     70					    ;aqui va el	código de instrucciones
+     71					    ;del programa.
+     72
+     73						;
+     74						Limpiar	0eh,255,255 ;Macro Limpiar
+1    75	0007  B8 0600			     mov ax,0600h
+1    76	000A  B7 0E			     mov bh,0eh
+1    77	000C  33 C9			     xor cx,cx
+1    78	000E  B6 FF			     mov dh,255
+1    79	0010  B2 FF			     mov dl,255
+1    80	0012  CD 10			     int 10h
+     81
+     82	0014  B4 09				mov ah,	09h  ;Mostar lo	que tiene mensaje en ventana
+     83	0016  BA 0000r				mov dx,	offset mensaje
+     84	0019  83 C2 0B				add dx,0bh  ;siempre empieza con 0 y termina en	h por la h de hexadecimal o sea	va a+
+     85				     agregar una B a dx
+     86	001C  CD 21				int 21h
+     87
+     88						;----------Interrupcion	de una tecla
+     89	001E  B4 00				mov ah,00h
+     90	0020  CD 16				int 16h
+     91						;----------Limpiar pantalla
+     92						Limpiar	0eh,040h,060h ;Macro Limpiar
+1    93	0022  B8 0600			     mov ax,0600h
+1    94	0025  B7 0E			     mov bh,0eh
+1    95	0027  33 C9			     xor cx,cx
+1    96	0029  B6 40			     mov dh,040h
+1    97	002B  B2 60			     mov dl,060h
+1    98	002D  CD 10			     int 10h
+     99
+    100	002F  88 26 003Dr			mov var1,ah
+    101
+    102	0033  33 C0				xor ax,ax	     ;prepara el ah y al para la int 21h 4c00h.
+    103	0035  B8 4C00			    mov	ax,4c00h     ;int 21h ah=4ch al=00h
+    104	0038  CD 21			    int	21h		     ;ejecute DOS. (termine el programa	con codigo 00).
+    105	003A			     Codigo EndS
+    106					  End Inicio
+Turbo Assembler	 Version 4.1	    06/06/14 11:03:51	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "06/06/14"
+??FILENAME			  Text	 "primero2"
+??TIME				  Text	 "11:03:51"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 PRIMERO2
+@WORDSIZE			  Text	 2
+INICIO				  Near	 CODIGO:0000
+MENSAJE				  Byte	 DATOS:0000
+MENSAJE2			  Byte	 DATOS:000A
+REPITALO			  Byte	 DATOS:001B
+TECLA				  Byte	 DATOS:0040
+VAR1				  Byte	 DATOS:003D
+VAR2				  Byte	 DATOS:003E
+VAR3				  Byte	 DATOS:003F
+VECTORASCII			  Byte	 DATOS:0041
+
+Macro Name
+
+IMPRIMECADENA
+IMPRIMIRCARACTER
+KEYPRESSED
+LEETECLA
+LIMPIAR
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  003A Para	  none
+DATOS				  16  0140 Para	  none
+PILA				  16  0100 Para	  none
+

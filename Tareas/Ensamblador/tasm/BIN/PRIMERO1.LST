@@ -1,0 +1,90 @@
+Turbo Assembler	 Version 4.1	    09/23/14 11:15:43	    Page 1
+primero1.ASM
+
+
+
+      1	0000			     Pila Segment
+      2
+      3	0000  40*(50 69	6C 61)		  db 64	Dup ('Pila')
+      4
+      5	0100			     Pila EndS
+      6
+      7	0000			     Datos Segment
+      8
+      9	0000  48 6F 6C 61 20 4D	75+	  Mensaje   db 'Hola Mundo'
+     10	      6E 64 6F
+     11	000A  66 65 6E 6F 6D 65	6E+	      Mensaje2	db 'fenomeno dia... $'
+     12	      6F 20 64 69 61 2E	2E+
+     13	      2E 20 24
+     14	001B  05			      var1	db 5
+     15	001C  02			      var2	db 2
+     16	001D  ??			      var3	db ?
+     17
+     18
+     19	001E			     Datos EndS
+     20
+     21	0000			     Codigo Segment
+     22	0000			      Inicio:
+     23					   Assume CS:Codigo, DS:Datos, SS:Pila
+     24
+     25
+     26	0000  33 C9			    xor	   cx,cx
+     27	0002  B9 0000s			    mov	   cx,Datos
+     28	0005  8E D9			    mov	   DS,cx
+     29
+     30					    ;aqui va el	código de instrucciones
+     31					    ;del programa.
+     32
+     33	0007  B8 0102				mov ax,	offset 0102h
+     34
+     35	000A  8A 26 001Br			mov ah,var1
+     36	000E  33 DB				xor bx,bx
+     37	0010  B3 00r				mov bl,	offset mensaje
+     38	0012  80 C3 1C				add bl,28
+     39	0015  33 F6				xor si,si
+     40	0017  8B F3				mov si,bx
+     41	0019  8A 04				mov al,Byte ptr	[si]
+     42	001B  02 E0				add ah,al    ;se guarda	el resultado en	el primer operando
+     43	001D  88 26 001Dr			mov var3,ah
+     44
+     45	0021  B4 09				mov ah,	09h  ;Mostar lo	que tiene mensaje en ventana
+     46	0023  BA 0000r				mov dx,	offset mensaje
+     47	0026  83 C2 0B				add dx,0bh  ;siempre empieza con 0 y termina en	h por la h de hexadecimal o sea	va a+
+     48				     agregar una B a dx
+     49	0029  CD 21				int 21h
+     50
+     51
+     52	002B  33 C0				xor ax,ax	     ;prepara el ah y al para la int 21h 4c00h.
+     53	002D  B8 4C00			    mov	ax,4c00h     ;int 21h ah=4ch al=00h
+     54	0030  CD 21			    int	21h		     ;ejecute DOS. (termine el programa	con codigo 00).
+     55	0032			     Codigo EndS
+     56					  End Inicio
+Turbo Assembler	 Version 4.1	    09/23/14 11:15:43	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/23/14"
+??FILENAME			  Text	 "primero1"
+??TIME				  Text	 "11:15:43"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 PRIMERO1
+@WORDSIZE			  Text	 2
+INICIO				  Near	 CODIGO:0000
+MENSAJE				  Byte	 DATOS:0000
+MENSAJE2			  Byte	 DATOS:000A
+VAR1				  Byte	 DATOS:001B
+VAR2				  Byte	 DATOS:001C
+VAR3				  Byte	 DATOS:001D
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0032 Para	  none
+DATOS				  16  001E Para	  none
+PILA				  16  0100 Para	  none
+

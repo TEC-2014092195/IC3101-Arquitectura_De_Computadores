@@ -1,0 +1,199 @@
+Turbo Assembler	 Version 4.1	    11/05/14 11:19:44	    Page 1
+asterix2.ASM
+
+
+
+      1				     ; ***************************************************
+      2				     ; Asterisco rebotador en la pantalla
+      3				     ; ***************************************************
+      4
+      5	0000			     Pila Segment Stack	'Stack'
+      6	0000  0800*(????)		     dw	2048 dup(?)
+      7	1000			     Pila Ends
+      8
+      9	0000			     Datos Segment
+     10	0000  00			     FIL DB 0
+     11	0001  00			     COL DB 0
+     12	0002  04			     DIR DB 4
+     13	0003  2A			     ASTERIX DB	'*'   ;	Fondo negro y asterisco	verde CLARO ->0AH
+     14	0004  012C			     PAUSA1 dw 300
+     15	0006  012C			     PAUSA2 dw 300 ; En	total hace de pausa 10000x2000=20 000 000 de nops
+     16	0008			     Datos Ends
+     17
+     18	0000			     Codigo Segment
+     19					     Assume DS:Datos,CS:Codigo,SS:Pila
+     20
+     21	0000  B8 0000s		     Inicio: MOV AX,DATOS
+     22	0003  8E D8			     MOV DS,AX
+     23	0005  B8 0000s			     MOV AX,PILA
+     24	0008  8E D0			     MOV SS,AX
+     25
+     26	000A  B8 B800			     MOV AX,0B800H
+     27						     ;Clear Screen
+     28	000D  8E C0			     MOV ES,AX
+     29	000F  B8 B800				     mov ax,0B800h
+     30	0012  8E C0				     mov es,ax
+     31	0014  33 FF				     xor di,di
+     32	0016  33 C0				     xor ax,ax
+     33	0018  B9 07D0				     mov cx,2000d
+     34	001B  FC				     cld
+     35	001C  F3> AB				     rep stosw
+     36
+     37	001E  E8 0005			     CALL MOVIMIENTO
+     38	0021  B8 4C00			     MOV AX, 4C00h
+     39	0024  CD 21			     INT 21h
+     40
+     41	0026			     MOVIMIENTO	PROC NEAR
+     42				     ; Este procedimiento pone el asterisco, hace una pasua y lo mueve un campo
+     43
+     44	0026			     DESPLEGAR:
+     45	0026  33 C0					     XOR AX,AX
+     46	0028  B0 A0					     MOV AL,160		  ; Calculamos BX = FIL*160+Col*2
+     47	002A  F6 26 0000r			     MUL FIL
+     48	002E  32 FF				     XOR BH, BH
+     49	0030  8A 1E 0001r			     MOV BL, COL
+     50	0034  D1 E3				     SHL BX,1
+     51	0036  03 D8				     ADD BX,AX
+     52
+     53
+     54
+     55						     ;MOV DX,WORD PTR ES:[BX]	  ; Salvamos lo	que hay	en la pantalla
+     56
+     57
+Turbo Assembler	 Version 4.1	    11/05/14 11:19:44	    Page 2
+asterix2.ASM
+
+
+
+     58	0038  A0 0003r				     MOV AL,ASTERIX
+     59	003B  80 3E 0000r 03			     CMP FIL,3
+     60	0040  74 03				     JE	CONTINUAR
+     61	0042  EB 05 90				     JMP CONTINUAR2
+     62	0045			     CONTINUAR:
+     63	0045  B4 8F				     MOV AH,08Fh
+     64	0047  74 02				     JE	SEGUIR
+     65	0049			     CONTINUAR2:
+     66	0049  B4 0F				     MOV AH,00FH
+     67
+     68	004B			     SEGUIR:
+     69	004B  26: 89 07				     MOV WORD PTR ES:[BX],AX	 ; Ponemos el asterisco	en pantalla
+     70	004E  8B 0E 0004r		     MOV CX, PAUSA1	  ; Hacemos una	pausa de 100 x 1000 nops
+     71	0052  51		     P1:     PUSH CX
+     72	0053  8B 0E 0006r		     MOV CX, PAUSA2
+     73	0057  90		     P2:     NOP
+     74	0058  E2 FD			     LOOP P2
+     75	005A  59			     POP CX
+     76	005B  E2 F5			     LOOP P1
+     77
+     78	005D  B6 0A				     MOV DH,0Ah	; Cambia el Background del char	que queda impreso a verde con OAh
+     79	005F  26: 89 17			     MOV WORD PTR ES:[BX],DX	; Borramos el asterisco
+     80
+     81
+     82	0062  80 3E 0004r 0F		cmp asterix+1,15
+     83	0067  74 03			je ponecolor0
+     84	0069  EB 06 90			jmp salecolor
+     85	006C  C6 06 0004r 00	     ponecolor0: mov asterix+1,	0
+     86	0071			     salecolor:
+     87
+     88
+     89						     ;INTERRUPCION DE TECLADO
+     90	0071  B4 01				     MOV AH,01H
+     91	0073  CD 16				     INT 16H
+     92	0075  74 03				     JZ	CUATRO
+     93	0077  EB 46 90				     JMP HAYTECLA
+     94
+     95				     ;----------------------------MUEVE	EL ASTERISCO---------------------------
+     96
+     97	007A  80 3E 0000r 18	     CUATRO: CMP FIL,24
+     98	007F  74 24			     JE	CD4A   ; Cambio	la direccion a 5
+     99	0081  FE 06 0000r		     INC FIL
+    100						     ;RANDOM
+    101	0085  B4 2C				     mov ah, 2ch  ; Set	function code
+    102	0087  CD 21				     int 21h	  ; get	time from MS-DOS
+    103	0089  8B C2				     mov ax, dx	  ; DH=seconds,	DL=hundredths of second
+    104	008B  25 000F				     and ax, 0Fh  ; keep only the 4 last bits of the hundredth of seconds
+    105	008E  88 16 0003r			     MOV ASTERIX,DL
+    106	0092  33 C0				     XOR AX,AX
+    107	0094  80 3E 0003r 7E			     CMP ASTERIX,126
+    108	0099  7C 00				     jl	varMenor ;If ASTERIX < 126
+    109						     ;ELSE
+    110
+    111
+    112	009B			     varMenor:
+    113						     ;FIN RANDOM
+    114	009B  80 3E 0001r 4F		     CMP COL,79
+Turbo Assembler	 Version 4.1	    11/05/14 11:19:44	    Page 3
+asterix2.ASM
+
+
+
+    115	00A0  74 15			     JE	CD4B   ; Cambio	la direccion a 7
+    116	00A2  EB 23 90			     JMP REPETIR
+    117	00A5  80 06 0001r 01	     CD4A:   ADD COL,1
+    118	00AA  C6 06 0000r 00			     MOV FIL,0
+    119	00AF  C6 06 0003r 0F			     MOV ASTERIX,0FH
+    120	00B4  EB 11 90			     JMP REPETIR
+    121	00B7  C6 06 0001r 00	     CD4B:   MOV COL, 0
+    122	00BC  EB 09 90				     JMP REPETIR
+    123
+    124				     ;------------------------------------------------------------------------
+    125				     ;PROCESA LA TECLA DE FUNCION EXTENDIDA
+    126	00BF  32 E4		     HAYTECLA:		     XOR AH,AH
+    127	00C1  CD 16					     INT 16H
+    128	00C3  3C 1B					     CMP AL,27	     ;SI ES ESC
+    129	00C5  74 03					     JZ	SALIR
+    130
+    131	00C7  E9 FF5C		     REPETIR: JMP DESPLEGAR
+    132
+    133	00CA  C3		     SALIR:  RET
+    134
+    135	00CB			     MOVIMIENTO	ENDP
+    136
+    137	00CB			     Codigo ENDS
+    138				     END Inicio
+Turbo Assembler	 Version 4.1	    11/05/14 11:19:44	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "11/05/14"
+??FILENAME			  Text	 "asterix2"
+??TIME				  Text	 "11:19:44"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 ASTERIX2
+@WORDSIZE			  Text	 2
+ASTERIX				  Byte	 DATOS:0003
+CD4A				  Near	 CODIGO:00A5
+CD4B				  Near	 CODIGO:00B7
+COL				  Byte	 DATOS:0001
+CONTINUAR			  Near	 CODIGO:0045
+CONTINUAR2			  Near	 CODIGO:0049
+CUATRO				  Near	 CODIGO:007A
+DESPLEGAR			  Near	 CODIGO:0026
+DIR				  Byte	 DATOS:0002
+FIL				  Byte	 DATOS:0000
+HAYTECLA			  Near	 CODIGO:00BF
+INICIO				  Near	 CODIGO:0000
+MOVIMIENTO			  Near	 CODIGO:0026
+P1				  Near	 CODIGO:0052
+P2				  Near	 CODIGO:0057
+PAUSA1				  Word	 DATOS:0004
+PAUSA2				  Word	 DATOS:0006
+PONECOLOR0			  Near	 CODIGO:006C
+REPETIR				  Near	 CODIGO:00C7
+SALECOLOR			  Near	 CODIGO:0071
+SALIR				  Near	 CODIGO:00CA
+SEGUIR				  Near	 CODIGO:004B
+VARMENOR			  Near	 CODIGO:009B
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  00CB Para	  none
+DATOS				  16  0008 Para	  none
+PILA				  16  1000 Para	  Stack	  STACK
+

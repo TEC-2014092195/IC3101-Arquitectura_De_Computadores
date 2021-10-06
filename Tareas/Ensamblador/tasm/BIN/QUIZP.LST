@@ -1,0 +1,86 @@
+Turbo Assembler	 Version 4.1	    10/23/14 23:44:51	    Page 1
+quizp.ASM
+
+
+
+      1	0000			     Pila Segment Stack	'Stack'
+      2	0000  0800*(????)		     dw	2048 dup(?)
+      3	1000			     Pila Ends
+      4
+      5	0000			     Datos Segment
+      6
+      7	0000			     Datos Ends
+      8
+      9	0000			     Codigo Segment
+     10					     Assume DS:Datos,CS:Codigo,SS:Pila
+     11
+     12	0000			     inicio:
+     13
+     14	0000  B8 0013		       mov ax,0013h
+     15	0003  CD 10		       int 10h
+     16	0005  B8 A000		       mov ax, 0A000h
+     17	0008  8E D8		       mov ds, ax
+     18
+     19
+     20	000A  B9 C800		       mov cx,0C800h ;
+     21	000D  33 D2		       xor dx,dx
+     22	000F  33 FF		       xor di,di
+     23
+     24	0011  B9 0010		      mov cx,10h
+     25	0014			       columnas:
+     26
+     27	0014  89 15		       mov [di], dx
+     28	0016  47		       inc di
+     29	0017  42		       inc dx
+     30
+     31	0018  47		       inc di
+     32	0019  47		       inc di
+     33	001A  47		       inc di
+     34	001B  47		       inc di
+     35
+     36				       ;add di,0040h ; saltar al inicio	de siguiente fila
+     37				       ;xor dx,dx    ; reiniciar columnas y color
+     38
+     39	001C  E2 F6		       loop columnas
+     40
+     41
+     42
+     43				       ; esperar por tecla
+     44	001E  B4 10		       mov ah,10h
+     45	0020  CD 16		       int 16h
+     46
+     47				       ; regresar a modo texto
+     48	0022  B8 0003		       mov ax,0003h
+     49	0025  CD 10		       int 10h
+     50
+     51				       ; finalizar el programa
+     52	0027  B8 4C00		       mov ax,4c00h
+     53	002A  CD 21		       int 21h
+     54
+     55	002C			     Codigo ENDS
+     56				     END Inicio
+Turbo Assembler	 Version 4.1	    10/23/14 23:44:51	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/23/14"
+??FILENAME			  Text	 "quizp	  "
+??TIME				  Text	 "23:44:51"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 QUIZP
+@WORDSIZE			  Text	 2
+COLUMNAS			  Near	 CODIGO:0014
+INICIO				  Near	 CODIGO:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  002C Para	  none
+DATOS				  16  0000 Para	  none
+PILA				  16  1000 Para	  Stack	  STACK
+

@@ -1,0 +1,177 @@
+Turbo Assembler	 Version 4.1	    10/27/14 00:46:15	    Page 1
+graph.ASM
+
+
+
+      1				     ; ***************************************************
+      2				     ; Asterisco rebotador en la pantalla
+      3				     ; ***************************************************
+      4
+      5	0000			     Pila Segment Stack	'Stack'
+      6	0000  0800*(????)		     dw	2048 dup(?)
+      7	1000			     Pila Ends
+      8
+      9	0000			     Datos Segment
+     10	0000  00			     FIL DB 0
+     11	0001  00			     COL DB 0
+     12	0002  04			     DIR DB 4
+     13	0003  2A			     ASTERIX DB	'*'   ;	Fondo negro y asterisco	verde CLARO ->0AH
+     14	0004  012C			     PAUSA1 dw 300
+     15	0006  012C			     PAUSA2 dw 300 ; En	total hace de pausa 10000x2000=20 000 000 de nops
+     16	0008  74 65 78 74 6F 24			     Text db 'texto$'
+     17	000E			     Datos Ends
+     18
+     19	0000			     Codigo Segment
+     20					     Assume DS:Datos,CS:Codigo,SS:Pila
+     21	0000			     Inicio:
+     22					     ; INT 10h / AH = 0	- configurar modo de video.
+     23				       ; AL = modo de video deseado.
+     24				       ;     00h - modo	texto. 40x25. 16 colores. 8 paginas.
+     25				       ;     03h - modo	texto. 80x25. 16 colores. 8 paginas.
+     26				       ;     13h - modo	grafico. 40x25.	256 colores.
+     27				       ;	   320x200 pixeles. 1 pagina.
+     28	0000  B8 0013		       mov ax,0013h
+     29	0003  CD 10		       int 10h
+     30	0005  B8 A000		       mov ax, 0A000h
+     31	0008  8E D8		       mov ds, ax  ; DS	= A000h	(memoria de graficos).
+     32
+     33				       ; ==============	Lineas verticales ======================
+     34				       ; Queremos pintar 256 colummas, cada una	con un alto de
+     35				       ; 200 pixeles. Podemos ejecutar 51,200 ciclos.
+     36				       ; Como la memoria de graficos es	lineal,	es mejor pintar
+     37				       ; una fila a la vez, cada fila tiene 320	columnas, pero
+     38				       ; solo pintamos 256. Al llegar a	la columna 256 saltamos
+     39				       ; a la siguiente	fila sumando 320-256 = 64
+     40				       ; Cada pixel cambia de color para dar el	efecto de lineas
+     41				       ; verticales
+     42	000A  B9 C800		       mov cx,0C800h ; # de pixeles
+     43	000D  33 D2		       xor dx,dx     ; contador	de columnas y color
+     44	000F  33 FF		       xor di,di
+     45
+     46
+     47
+     48				       ; ciclo_1:
+     49				       ; mov [di], dx ;	poner color en A000:DI
+     50				       ; inc di
+     51				       ; inc dx
+     52				       ; cmp dx,256
+     53				       ; jne sig_pix1
+     54
+     55				       ; add di,0040h ;	saltar al inicio de siguiente fila
+     56				       ; xor dx,dx    ;	reiniciar columnas y color
+     57				     ; sig_pix1:
+Turbo Assembler	 Version 4.1	    10/27/14 00:46:15	    Page 2
+graph.ASM
+
+
+
+     58				       ; loop ciclo_1
+     59
+     60					     ;INT 10 - AH = 09h	VIDEO -	WRITE ATTRIBUTES/CHARACTERS AT CURSOR POS
+     61	0011  B4 09			     MOV AH,09H
+     62	0013  B0 2A			     MOV AL ,'*'
+     63	0015  B7 00			     MOV BH ,00h ;Screen Page
+     64	0017  B3 0A			      MOV BL ,001010b ;Color (graphics mode)
+     65					     ;MOV DX, 0FH ;row number (y coordinate)
+     66	0019  B9 0001			     MOV CX ,01h
+     67	001C  CD 10			     int 10h
+     68
+     69					     ;INT 10 - AH = 02h	VIDEO -	SET CURSOR POSITION					    +
+     70				     http://mprolab.teipir.gr/vivlio80X86/dosints.pdf
+     71	001E  B4 02			     MOV AH,02h
+     72	0020  B6 00			     MOV DH,0h
+     73	0022  B2 00			     MOV DL,0h
+     74	0024  CD 10			     int 10h
+     75
+     76					     ;INT 10 - AH = 0Eh	VIDEO -	WRITE CHARACTER	AND ADVANCE CURSOR (TTY	WRITE)		    +
+     77				     http://mprolab.teipir.gr/vivlio80X86/dosints.pdf
+     78					     ;AL = character
+     79	0026  B4 0E			     MOV AH,0Eh
+     80	0028  B0 2A			     MOV AL,2Ah
+     81	002A  B7 00			     MOV BH,00h
+     82	002C  B3 18			     MOV BL,18h
+     83	002E  B9 00F0			     MOV CX,0F0h
+     84	0031  CD 10			     int 10h
+     85
+     86	0033  B4 0E			     MOV AH,0Eh
+     87	0035  B0 2A			     MOV AL,2Ah
+     88	0037  B7 00			     MOV BH,00h
+     89	0039  B3 19			     MOV BL,19h
+     90	003B  B9 00F0			     MOV CX,0F0h
+     91	003E  CD 10			     int 10h
+     92					     ; Video Palette INT 10h AX	= 1010h
+     93					     ;------------------------------------------
+     94					     ;Modify the palette of one	color.
+     95					     ;BX = color number
+     96					     ;ch = green
+     97					     ;cl = blue
+     98					     ;dh = red
+     99					     ;------------------------------------------
+    100	0040  B8 1010			     MOV AX,1010h
+    101	0043  B3 18			     MOV BL,18h
+    102	0045  B5 0F			     MOV ch,0Fh
+    103	0047  B1 00			     MOV CL,0H
+    104	0049  B6 00			     MOV DH,0h
+    105	004B  CD 10			     INT 10h
+    106
+    107	004D  B8 1010			     MOV AX,1010h
+    108	0050  B3 19			     MOV BL,19h
+    109	0052  B5 FF			     MOV ch,0FFh
+    110	0054  B1 0F			     MOV CL,0Fh
+    111	0056  B6 0F			     MOV DH,0Fh
+    112	0058  CD 10			     INT 10h
+    113
+    114
+Turbo Assembler	 Version 4.1	    10/27/14 00:46:15	    Page 3
+graph.ASM
+
+
+
+    115
+    116				       ; esperar por tecla
+    117	005A  B4 10		       mov ah,10h
+    118	005C  CD 16		       int 16h
+    119
+    120
+    121				       ; regresar a modo texto
+    122	005E  B8 0003		       mov ax,0003h
+    123	0061  CD 10		       int 10h
+    124
+    125				       ; finalizar el programa
+    126	0063  B8 4C00		       mov ax,4c00h
+    127	0066  CD 21		       int 21h
+    128	0068  C3		       ret
+    129
+    130	0069			     Codigo ENDS
+    131				     END Inicio
+Turbo Assembler	 Version 4.1	    10/27/14 00:46:15	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/27/14"
+??FILENAME			  Text	 "graph	  "
+??TIME				  Text	 "00:46:15"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 GRAPH
+@WORDSIZE			  Text	 2
+ASTERIX				  Byte	 DATOS:0003
+COL				  Byte	 DATOS:0001
+DIR				  Byte	 DATOS:0002
+FIL				  Byte	 DATOS:0000
+INICIO				  Near	 CODIGO:0000
+PAUSA1				  Word	 DATOS:0004
+PAUSA2				  Word	 DATOS:0006
+TEXT				  Byte	 DATOS:0008
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0069 Para	  none
+DATOS				  16  000E Para	  none
+PILA				  16  1000 Para	  Stack	  STACK
+

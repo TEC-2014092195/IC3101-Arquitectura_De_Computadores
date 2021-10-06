@@ -1,0 +1,66 @@
+Turbo Assembler	 Version 4.1	    10/23/14 20:42:34	    Page 1
+fact2.ASM
+
+
+
+      1				     Extrn factorial:Far
+      2
+      3	0000			     Pila Segment
+      4	0000  40*(20 50	69 6C 61  +	     db	64 Dup (' Pila ')
+      5	      20)
+      6	0180			     Pila EndS
+      7
+      8	0000			     Datos Segment
+      9	0000  03			     var db 3
+     10	0001			     Datos EndS
+     11
+     12
+     13	0000			     Codigo Segment
+     14					     Assume CS:	Codigo,	DS:Datos, SS:Pila
+     15
+     16	0000				     Inicio:
+     17	0000  33 C9				     xor cx,cx
+     18	0002  B9 0000s				     mov cx,Datos
+     19	0005  8E D9				     mov DS,cx
+     20
+     21	0007  50 55 8B EC C7 46	02+		     push 3
+     22	      0003 5D
+     23	0011  9A 00000000se			     call factorial
+     24
+     25	0016  8A D3				     mov dl,bl
+     26	0018  80 C2 26				     add dl,26h
+     27
+     28	001B  B4 02				     mov ah, 02h		     ;se imprime en consola
+     29	001D  CD 21				     int 21h
+     30
+     31
+     32	001F  B8 4C00				     mov ax,4c00h
+     33	0022  CD 21				     int 21h
+     34	0024			     Codigo EndS
+     35					     End Inicio
+Turbo Assembler	 Version 4.1	    10/23/14 20:42:34	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/23/14"
+??FILENAME			  Text	 "fact2	  "
+??TIME				  Text	 "20:42:34"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 FACT2
+@WORDSIZE			  Text	 2
+FACTORIAL			  Far	 ----:---- Extern
+INICIO				  Near	 CODIGO:0000
+VAR				  Byte	 DATOS:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0024 Para	  none
+DATOS				  16  0001 Para	  none
+PILA				  16  0180 Para	  none
+

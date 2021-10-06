@@ -1,0 +1,62 @@
+
+     include Macro.cbc 
+
+CodigoP1 Segment PARA 'Code'
+
+	Public GuardarPila, ImprimirAyuda, Sumar
+	Assume CS:CodigoP1
+	
+	
+	GuardarPila Proc Far
+		POPA1
+		;nesecita tener cargado el en el DI la ultima poscicion del PSP
+		Mov Bx, 2 ; posicion de donde va a iniciar a guardar a partir del 
+		Xor Cx, Cx ; para limpiar el registro
+		Xor Dx, Dx ;limpia el registro
+		
+		Mov Cl, Byte PTR[Bx+7Eh] ;Pone la cantidad que se va aguardar 
+		Dec Cx
+	GuardarAPila:
+		mov Dl, Byte PTR [Bx+80h]
+		push Byte PTR Dx
+		Inc Bx
+		loop GuardarAPila
+		
+	
+		
+		ret
+	GuardarPila EndP
+	
+	
+	Sumar Proc  FAR
+		Xor dx,dx ; para limpiar el registro
+		Xor Bx,Bx ;para limpiar el registro
+		Mov SI,4 ; para saber el indice que voy sumando
+		Mov Cx,5 ;para el loop o el ciclo de de sumado
+		Xor Ax,AX; para limpiar el registro que voy a usar para carry
+		
+	Mover:	
+		Mov Dl,Byte PTR Num1[SI]; muevo el resultado de la posicion que voy sumando
+		Mov Bl,Dl
+		ADC Bl,Byte PTR Num2[SI];encinde la bandera de carry si el valor tiene acarreo
+		JNC no_incrementar
+		inc Ax ; para establecer el carry en uno 
+
+		
+	no_incrementar:	
+		AAA Dl,Num2[SI]; me retorna el valor menos significativo de la suma, 
+		;como si la suma fuese en decimal
+		Add dl,al ; para sumar el carry , ¿sera mas eficente que comparar si el carry es uno y sumarlo?
+		xor Ax,Ax
+		Mov res[SI+1], Dl
+		dec Cx ;para saber que cumpli un ciclo de gardado
+		CMP CX,0
+		JE Salir_ciclo
+		JMP Mover
+	Salir_ciclo:
+		Ret
+	Sumar EndP
+	
+	
+CodigoP1 EndS
+End 

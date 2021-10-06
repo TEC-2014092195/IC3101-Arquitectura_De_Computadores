@@ -1,0 +1,66 @@
+Turbo Assembler	 Version 4.1	    09/25/14 10:26:37	    Page 1
+macro.ASM
+
+
+
+      1	0000			     Datos Segment
+      2
+      3	0000			     Datos EndS
+      4
+      5				     Delay Macro Param,	Num
+      6					     mov cx,Num
+      7				     Param:
+      8					     push cx
+      9					     pop cx
+     10					     loop Param
+     11				     EndM
+     12
+     13
+     14	0000			     Codigo Segment
+     15	0000			     comienceaqui:
+     16					     Assume cs:codigo, ds:datos
+     17
+     18	0000  33 C0			     xor ax,ax
+     19	0002  B8 0000s			     mov ax,Datos
+     20	0005  8E D8			     mov Ds,Ax
+     21
+     22					 Delay A,5
+1    23	0007  B9 0005			     mov cx,5
+1    24	000A			     A:
+1    25	000A  51			     push cx
+1    26	000B  59			     pop cx
+1    27	000C  E2 FC			     loop A
+     28
+     29	000E  B8 4C00			     mov ax,4c00h
+     30	0011  CD 21			     int 21h
+     31
+     32	0013			     Codigo EndS
+     33				     End comienceaqui
+Turbo Assembler	 Version 4.1	    09/25/14 10:26:37	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/25/14"
+??FILENAME			  Text	 "macro	  "
+??TIME				  Text	 "10:26:37"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 MACRO
+@WORDSIZE			  Text	 2
+A				  Near	 CODIGO:000A
+COMIENCEAQUI			  Near	 CODIGO:0000
+
+Macro Name
+
+DELAY
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  0013 Para	  none
+DATOS				  16  0000 Para	  none
+

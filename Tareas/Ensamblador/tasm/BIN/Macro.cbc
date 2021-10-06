@@ -1,0 +1,19 @@
+PushAll Macro 
+       push      ax		;Guarda los todos los registro en... 
+       push      bx		;...la pila del programa.
+       push      cx		;Preparación para rutinas
+       push      dx		;Debe tener cuidado de llamar a la...
+       push      si		;...siguiente macro (PopAllRegs) para...
+       push      di		;poner equilibrar la pila...
+       pushf			;Guarda el registro de banderas en la pila.
+EndM				;Su contra parte es la macro siguiente. 
+
+PopAll Macro
+       popf		        ;...la pila del programa.
+       pop       di		;...llamado antes a pushallregs.
+       pop       si		; Sino se produce un error en el programa.
+       pop       dx
+       pop       cx
+       pop       bx
+       pop       ax
+EndM

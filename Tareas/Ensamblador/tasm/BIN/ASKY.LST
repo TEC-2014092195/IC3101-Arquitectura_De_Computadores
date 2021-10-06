@@ -1,0 +1,210 @@
+Turbo Assembler	 Version 4.1	    09/03/14 23:13:01	    Page 1
+asky.ASM
+
+
+
+      1	0000			     datos segment
+      2	0000  50 72 65 73 69 6F	6E+	     mensaje db	"Presione cualquier tecla para conocer su codigo ascii,	en hexadecimal y    +
+      3	      65 20 63 75 61 6C	71+  decimal",10,13,"$"	;Para imprimir $ pongo el ascii	24h
+      4	      75 69 65 72 20 74	65+
+      5	      63 6C 61 20 70 61	72+
+      6	      61 20 63 6F 6E 6F	63+
+      7	      65 72 20 73 75 20	63+
+      8	      6F 64 69 67 6F 20	61+
+      9	      73 63 69 69 2C 20	65+
+     10	      6E 20 68 65 78 61	64+
+     11	      65 63 69 6D 61 6C	20+
+     12	      79 20 64 65 63 69	6D+
+     13	      61 6C 0A 0D 24
+     14	0052  41 42 43 44 45 46		     tablahex db "ABCDEF"
+     15	0058  ??			     var2 db ?
+     16	0059  48 65 78 61 64 65	63+	     hexa db "Hexadecimal: $"
+     17	      69 6D 61 6C 3A 20	24
+     18	0067  44 65 63 69 6D 61	6C+	     deci db "Decimal: $"
+     19	      3A 20 24
+     20
+     21	0071  ??			     dig1 db ?
+     22	0072  ??			     dig2 db ?
+     23	0073  ??			     dig3 db ?
+     24
+     25	0074			     datos EndS
+     26
+     27	0000			     codigo Segment
+     28	0000			     comienceaqui:
+     29					     Assume cs:codigo, ds:datos
+     30
+     31	0000  33 C0			     xor ax,ax
+     32	0002  B8 0000s			     mov ax,Datos
+     33	0005  8E D8			     mov Ds,Ax
+     34
+     35	0007  33 D2			     xor dx, dx
+     36
+     37	0009  BA 0000r			     mov dx,offset mensaje
+     38	000C  B4 09			     mov ah,09h		      ;09h despliega el	mensaje	en pantalla
+     39	000E  CD 21			     int 21h		      ;ejecuta la interrupcion para desplegarlo
+     40
+     41	0010  B4 01			     mov ah,01h		      ;01h hace	un escaneo (eco) de lo que se escribio en pantalla
+     42	0012  CD 21			     int 21h		      ;interrumpe para ejecutar	el 01h
+     43	0014  A2 0058r			     mov var2,al
+     44
+     45	0017  B2 20			     mov dl,' '
+     46	0019  B4 02			     mov ah,02h
+     47	001B  CD 21			     int 21h
+     48	001D  B2 2D			     mov dl,'-'
+     49	001F  B4 02			     mov ah,02h
+     50	0021  CD 21			     int 21h
+     51	0023  B2 3E			     mov dl,'>'
+     52	0025  B4 02			     mov ah,02h
+     53	0027  CD 21			     int 21h
+     54	0029  B2 20			     mov dl,' '
+     55	002B  B4 02			     mov ah,02h
+     56	002D  CD 21			     int 21h
+     57	002F  B2 59r			     mov dl,offset hexa
+Turbo Assembler	 Version 4.1	    09/03/14 23:13:01	    Page 2
+asky.ASM
+
+
+
+     58	0031  B4 09			     mov ah,09h
+     59	0033  CD 21			     int 21h
+     60
+     61	0035  8A 16 0058r		     mov dl,var2
+     62	0039  80 E2 F0			     and dl,11110000b
+     63	003C  D0 EA D0 EA D0 EA	D0+	     shr dl,4
+     64	      EA
+     65	0044  80 FA 09			     cmp dl,09h
+     66	0047  7F 63			     jg	hex1		      ;salta si	es mayor
+     67	0049  80 C2 30			     add dl,30h
+     68	004C			       v1:
+     69	004C  B4 02			     mov ah,02h
+     70	004E  CD 21			     int 21h
+     71	0050  8A 16 0058r		     mov dl,var2
+     72	0054  80 E2 0F			     and dl,00001111b
+     73	0057  80 FA 09			     cmp dl,09h
+     74	005A  7F 5D			     jg	hex2		      ;salta si	es mayor
+     75	005C  80 CA 30			     or	dl,30h
+     76	005F			       v2:
+     77	005F  B4 02			     mov ah,02h
+     78	0061  CD 21			     int 21h
+     79
+     80					     ;Espacio para imprimir el siguiente numero
+     81	0063  B2 20			     mov dl,' '
+     82	0065  B4 02			     mov ah,02h
+     83	0067  CD 21			     int 21h
+     84	0069  B2 2D			     mov dl,'-'
+     85	006B  B4 02			     mov ah,02h
+     86	006D  CD 21			     int 21h
+     87	006F  B2 3E			     mov dl,'>'
+     88	0071  B4 02			     mov ah,02h
+     89	0073  CD 21			     int 21h
+     90	0075  B2 20			     mov dl,' '
+     91	0077  B4 02			     mov ah,02h
+     92	0079  CD 21			     int 21h
+     93	007B  B2 67r			     mov dl,offset deci
+     94	007D  B4 09			     mov ah,09h
+     95	007F  CD 21			     int 21h
+     96
+     97
+     98
+     99				       ;Se termina de repetir.
+    100	0081  B9 0003			     mov cx, 3		     ;Cantidad de repeticiones del ciclo
+    101	0084			       Deci_1:
+    102	0084  33 C0			     xor ax, ax			     ;Se limpian los registros a utilizar
+    103	0086  33 DB			     xor bx, bx
+    104	0088  33 D2			     xor dx, dx
+    105
+    106	008A  A0 0058r			     mov al, var2	     ;Var 2 es un caracter en Hexa
+    107	008D  B3 0A			     mov bl, 10
+    108	008F  F6 F3			     div bl			     ;divide el	al entre el bl
+    109	0091  8A D4			     mov dl, ah			     ;residuo se guarda	en el ah si es de un byte
+    110	0093  80 C2 30			     add dl, 30h	     ;le suma 30 h para	imprimir
+    111	0096  8B D9			     mov bx, cx			     ;aquì copio el contador para no modificar el CX
+    112	0098  83 FB 03			     cmp bx, 3			     ;si esta en el primer ciclo, guarda el ultimo digito
+    113	009B  74 29			     je	guardar_Digito3	     ;
+    114	009D  83 FB 02			     cmp bx, 2			     ;si esta en la segunda pasada, guarda el penultimo
+Turbo Assembler	 Version 4.1	    09/03/14 23:13:01	    Page 3
+asky.ASM
+
+
+
+    115	00A0  74 2D			     je	guardar_Digito2	     ;
+    116	00A2  83 FB 01			     cmp bx, 1			     ;en la ultima, se sale del	loop e imprime todo
+    117	00A5  74 31			     je	guardar_Digito1	     ;
+    118
+    119	00A7  B8 4C00			     mov ax,4c00h
+    120	00AA  CD 21			     int 21h
+    121	00AC			       hex1:
+    122	00AC  33 F6			     xor si,si
+    123	00AE  8B F2			     mov si,dx
+    124	00B0  83 EE 0A			     sub si,0ah
+    125	00B3  8A 94 0052r		     mov dl,tablahex[si]
+    126	00B7  EB 93			     jmp v1
+    127	00B9			       hex2:
+    128	00B9  33 F6			     xor si,si
+    129	00BB  8B F2			     mov si,dx
+    130	00BD  83 EE 0A			     sub si,0ah
+    131	00C0  8A 94 0052r		     mov dl,tablahex[si]
+    132	00C4  EB 99			     jmp v2
+    133	00C6			       guardar_Digito3:
+    134	00C6  88 16 0071r		     mov dig1,dl		     ;guarda el	dl en el dìgito	1 por el orden
+    135	00CA  A2 0058r			     mov var2,al		     ;actualizo	var2 para que guarde lo	que queda del numero
+    136	00CD  E2 B5			     loop Deci_1		     ;me devuelvo al ciclo
+    137	00CF			       guardar_Digito2:
+    138	00CF  88 16 0072r		     mov dig2,dl		     ;guardo el	dl en el digito	2, el del medio
+    139	00D3  A2 0058r			     mov var2,al		     ;actualizo	var2
+    140	00D6  E2 AC			     loop Deci_1		     ;me devuelvo al ciclo
+    141	00D8			       guardar_Digito1:
+    142	00D8  88 16 0073r		     mov dig3, dl	     ;guardo el	ultimo digito en el digito 3
+    143	00DC  B4 02			     mov ah, 02h		     ;se imprime en la consola
+    144	00DE  CD 21			     int 21h			     ;
+    145	00E0  8A 16 0072r		     mov dl, dig2	     ;guardo el	siguiente digito en el dl
+    146	00E4  B4 02			     mov ah, 02h		     ;imprime el segundo digito	en consola
+    147	00E6  CD 21			     int 21h			     ;
+    148	00E8  8A 16 0071r		     mov dl, dig1	     ;guardo el	ultimo digito, (primero	en guardarse)
+    149	00EC  B4 02			     mov ah, 02h		     ;se imprime en consola
+    150	00EE  CD 21			     int 21h
+    151
+    152	00F0  B8 4C00			     mov ax,4c00h	     ;Cierra la	ejecucion
+    153	00F3  CD 21			     int 21h
+    154
+    155	00F5			     codigo EndS
+    156				     End comienceaqui
+Turbo Assembler	 Version 4.1	    09/03/14 23:13:01	    Page 4
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/03/14"
+??FILENAME			  Text	 "asky	  "
+??TIME				  Text	 "23:13:01"
+??VERSION			  Number 040A
+@CPU				  Text	 0101H
+@CURSEG				  Text	 CODIGO
+@FILENAME			  Text	 ASKY
+@WORDSIZE			  Text	 2
+COMIENCEAQUI			  Near	 CODIGO:0000
+DECI				  Byte	 DATOS:0067
+DECI_1				  Near	 CODIGO:0084
+DIG1				  Byte	 DATOS:0071
+DIG2				  Byte	 DATOS:0072
+DIG3				  Byte	 DATOS:0073
+GUARDAR_DIGITO1			  Near	 CODIGO:00D8
+GUARDAR_DIGITO2			  Near	 CODIGO:00CF
+GUARDAR_DIGITO3			  Near	 CODIGO:00C6
+HEX1				  Near	 CODIGO:00AC
+HEX2				  Near	 CODIGO:00B9
+HEXA				  Byte	 DATOS:0059
+MENSAJE				  Byte	 DATOS:0000
+TABLAHEX			  Byte	 DATOS:0052
+V1				  Near	 CODIGO:004C
+V2				  Near	 CODIGO:005F
+VAR2				  Byte	 DATOS:0058
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+CODIGO				  16  00F5 Para	  none
+DATOS				  16  0074 Para	  none
+
